@@ -17,7 +17,7 @@ build_prescriber_year <- R6::R6Class(
     partd_phys_source = dplyr::data_frame(),
     
     exclusion_criteria = list(
-      md = 'MD|md|DO|do',
+      doc = c('MD', 'DO', 'D.O', 'M.D'),
       claim_count = 20
     ),
     
@@ -39,7 +39,10 @@ build_prescriber_year <- R6::R6Class(
     },
     
     process_tables = function() {
-      return()
+      self$partd_phys_source <- self$partd_phys_source %>% 
+        filter(TOTAL_CLAIM_COUNT < self$exclusion_criteria$claim_count,
+               NPPES_CREDENTIALS %in% self$exclusion_criteria$doc,
+               (BRAND_CLAIM_COUNT > 0 | !is.na(BRAND_CLAIM_COUNT)))
     },
     
     save_processed_tables = function() {
