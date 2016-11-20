@@ -7,7 +7,14 @@ build_prescriber_year <- R6::R6Class(
     year = NULL,
     source_file_dir = '~/Dropbox/physician_payments/',
     drug_folder = 'PartD_Prescriber_PUF_NPI_DRUG',
-    phys_foler = 'PartD_Prescriber_PUF_NPI',
+    phys_folder = 'PartD_Prescriber_PUF_NPI',
+    partd_drug_source = data_frame(),
+    partd_phys_source = data_frame(),
+    
+    exclusion_criteria = list(
+      md = 'MD|md|DO|do',
+      claim_count = 20
+    ),
     
     
     initialize = function(yr = '2014') {
@@ -15,7 +22,13 @@ build_prescriber_year <- R6::R6Class(
     },
     
     read_source_tables = function() {
-      return()
+      self$partd_drug_source = readr::read_delim(
+        paste0(self$source_file_dir, self$drug_folder, '/', self$year, '/PartD_Prescriber_PUF_NPI_Drug.txt'),
+        delim = '\t')
+      
+      self$partd_phys_source = readr::read_delim(
+        paste0(self$source_file_dir, self$phys_folder, '/', self$year, '/PartD_Prescriber_PUF_NPI.txt'),
+        delim = '\t')
     },
     
     process_tables = function() {
