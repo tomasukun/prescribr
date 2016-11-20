@@ -8,8 +8,8 @@ build_prescriber_year <- R6::R6Class(
     source_file_dir = '~/Dropbox/physician_payments/',
     drug_folder = 'PartD_Prescriber_PUF_NPI_DRUG',
     phys_folder = 'PartD_Prescriber_PUF_NPI',
-    partd_drug_source = data_frame(),
-    partd_phys_source = data_frame(),
+    partd_drug_source = dplyr::data_frame(),
+    partd_phys_source = dplyr::data_frame(),
     
     exclusion_criteria = list(
       md = 'MD|md|DO|do',
