@@ -12,6 +12,7 @@ build_prescriber_year <- R6::R6Class(
     
     year = NULL,
     source_file_dir = '~/Dropbox/physician_payments/raw_source_data/',
+    processed_file_dir = '~/Dropbox/physician_payments/processed_source_data/',
     drug_folder = 'PartD_Prescriber_PUF_NPI_DRUG',
     phys_folder = 'PartD_Prescriber_PUF_NPI',
     phys_comp_folder = 'Physician_Compare',
@@ -60,8 +61,8 @@ build_prescriber_year <- R6::R6Class(
                doc_total_day_supply = TOTAL_DAY_SUPPLY,
                doc_bene_count_65 = BENE_COUNT_GE65,
                doc_total_claims_65 = TOTAL_CLAIM_COUNT_GE65,
-               doc_total_drug_cost = TOTAL_DRUG_COST_GE65,
-               doc_total_day_supply = TOTAL_DAY_SUPPLY_GE65,
+               doc_total_drug_cost_65 = TOTAL_DRUG_COST_GE65,
+               doc_total_day_supply_65 = TOTAL_DAY_SUPPLY_GE65,
                doc_brand_claims = BRAND_CLAIM_COUNT,
                doc_brand_cost = BRAND_DRUG_COST,
                doc_generic_claims = GENERIC_CLAIM_COUNT,
@@ -77,6 +78,7 @@ build_prescriber_year <- R6::R6Class(
       self$phys_compare_source = readr::read_csv(
         paste0(self$source_file_dir, self$phys_comp_folder, '/', self$year, 
                '/Physician_Compare_National_Downloadable_File.csv'), col_names = TRUE) %>% 
+        distinct(NPI, .keep_all = TRUE) %>% 
         select(NPI, 
                doc_grad_year = `Graduation year`,
                doc_group_size = `Number of Group Practice members`)
@@ -85,16 +87,16 @@ build_prescriber_year <- R6::R6Class(
     filter_tables = function() {
       # filtering MDs or DOs
       self$partd_phys_source <- self$partd_phys_source %>% 
-        filter(str_detect(NPPES_CREDENTIALS, self$exclusion_criteria$doc)) %>% 
+        filter(str_detect(doc_cred, self$exclusion_criteria$doc)) %>% 
         distinct(NPI, .keep_all = TRUE)
       self$study_pop$partd_docs <- nrow(self$partd_phys_source)
       # filtering docs in US
       self$partd_phys_source <- self$partd_phys_source %>%
-        filter(NPPES_PROVIDER_STATE %in% self$exclusion_criteria$states)
+        filter(doc_state %in% self$exclusion_criteria$states)
       self$study_pop$partd_us_docs <- nrow(self$partd_phys_source)
       # filtering docs with valid brand count
       self$partd_phys_source <- self$partd_phys_source %>%
-        filter(BRAND_CLAIM_COUNT)
+        filter(!is.na(doc_brand_claims))
       self$study_pop$valid_brand_docs <- nrow(self$partd_phys_source)
       # filtering docs in phys compare
       self$partd_phys_source <- self$partd_phys_source %>%
@@ -102,10 +104,10 @@ build_prescriber_year <- R6::R6Class(
       self$study_pop$phys_comp_docs <- nrow(self$partd_phys_source)
       # filtering docs with identical matching criteria
       self$partd_phys_source <- self$partd_phys_source %>%
-        group_by(NPPES_PROVIDER_LAST_ORG_NAME, NPPES_PROVIDER_FIRST_NAME,
-                 NPPES_PROVIDER_CITY, NPPES_PROVIDER_STATE) %>% 
+        group_by(doc_last_name, doc_first_name,
+                 doc_city, doc_state) %>% 
         mutate(dup_count = n()) %>% 
-        filter(dup_count == 0) %>% 
+        filter(dup_count == 1) %>% 
         ungroup()
       self$study_pop$unq_match_crit_partd_docs <- nrow(self$partd_phys_source)
     },
@@ -116,7 +118,9 @@ build_prescriber_year <- R6::R6Class(
     },
     
     save_processed_tables = function() {
-      return()
+      save(self$study_pop, file = 'data/study_pop.rData')
+      save(self$partd_combined, 
+           file = paste0(processed_file_dir, self$year,'partd_combined.rData'))
     },
     
     build_source = function() {
