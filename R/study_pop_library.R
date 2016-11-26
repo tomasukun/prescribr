@@ -11,6 +11,7 @@ study_pop_library <- R6::R6Class(
   public = list(
     
     study_pop = list(partd_docs = NULL,
+                     openpay_docs = NULL,
                      partd_us_docs = NULL,
                      valid_brand_docs = NULL,
                      phys_compare_docs = NULL,
