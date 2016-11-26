@@ -10,6 +10,9 @@ study_pop_library <- R6::R6Class(
   
   public = list(
     
+    source_file_dir = '~/Dropbox/physician_payments/raw_source_data/',
+    processed_file_dir = '~/Dropbox/physician_payments/processed_source_data/',
+    
     study_pop = list(partd_docs = NULL,
                      openpay_docs = NULL,
                      partd_us_docs = NULL,

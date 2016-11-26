@@ -13,8 +13,6 @@ build_openpay_year <- R6::R6Class(
   public = list(
     
     year = NULL,
-    source_file_dir = '~/Dropbox/physician_payments/raw_source_data/',
-    processed_file_dir = '~/Dropbox/physician_payments/processed_source_data/',
     openpay_folder = 'Open_Payments',
     openpay_source = dplyr::data_frame(),
     openpay_docs = dplyr::data_frame(),
