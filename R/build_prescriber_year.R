@@ -120,7 +120,9 @@ build_prescriber_year <- R6::R6Class(
     save_processed_tables = function() {
       study_pop <- self$study_pop
       partd_combined <- self$partd_combined
+      partd_docs <- self$partd_phys_source
       save(study_pop, file = 'data/study_pop.rData')
+      save(partd_docs, file = paste0(self$processed_file_dir, self$year,'/partd_docs.rData'))
       save(partd_combined, file = paste0(self$processed_file_dir, self$year,'/partd_combined.rData'))
     },
     
