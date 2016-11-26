@@ -5,6 +5,7 @@
 #' @import readr
 #' @import purrr
 #' @import lubridate
+#' @importFrom Kmisc kLoad
 
 build_openpay_year <- R6::R6Class(
   'build_openpay_year',
@@ -62,10 +63,12 @@ build_openpay_year <- R6::R6Class(
         select(doc_id, doc_last_name, doc_first_name, doc_city, doc_state, doc_zip,
                total_payment_dollars) %>% 
         distinct(doc_id, .keep_all = TRUE)
-      self$study_pop$openpay_docs <- nrow(self$openpay_docs)
+      study_pop <- Kmisc::kLoad('data/study_pop.rData')
+      study_pop$openpay_docs <- nrow(self$openpay_docs)
     },
     
     save_processed_tables = function() {
+      save(study_pop, file = 'data/study_pop.rData')
       openpay <- self$openpay_source
       openpay_docs <- self$openpay_docs
       save(openpay, file = paste0(self$processed_file_dir, self$year,'/open_payments.rData'))
