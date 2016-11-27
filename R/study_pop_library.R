@@ -29,6 +29,13 @@ study_pop_library <- R6::R6Class(
                      unq_match_crit_op_docs = NULL,
                      final_study_docs = NULL),
     
+    study_group_pop = list(
+      statins = list(
+        claim_count_100plus = NULL,
+        meal_payment = NULL,
+        tagged_payment = NULL
+      )
+    ),
     
     exclusion_criteria = list(
       doc = 'M.?D.?|D.?O.?',
