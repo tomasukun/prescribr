@@ -17,7 +17,7 @@ study_pop_library <- R6::R6Class(
                      openpay_docs = NULL,
                      partd_us_docs = NULL,
                      valid_brand_docs = NULL,
-                     phys_compare_docs = NULL,
+                     phys_comp_docs = NULL,
                      unq_match_crit_partd_docs = NULL,
                      med_grad_exclude_docs = NULL,
                      unq_match_crit_op_docs = NULL,
