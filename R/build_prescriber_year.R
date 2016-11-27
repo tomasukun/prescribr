@@ -11,8 +11,6 @@ build_prescriber_year <- R6::R6Class(
   public = list(
     
     year = NULL,
-    source_file_dir = '~/Dropbox/physician_payments/raw_source_data/',
-    processed_file_dir = '~/Dropbox/physician_payments/processed_source_data/',
     drug_folder = 'PartD_Prescriber_PUF_NPI_DRUG',
     phys_folder = 'PartD_Prescriber_PUF_NPI',
     phys_comp_folder = 'Physician_Compare',
@@ -85,11 +83,20 @@ build_prescriber_year <- R6::R6Class(
     },
     
     filter_tables = function() {
+      
+      exclude_specialites <- self$doc_specialty_categories %>% 
+        filter(specialty_category == 'EXCLUDE') %>% 
+        .$doc_specialty
+      
       # filtering MDs or DOs
       self$partd_phys_source <- self$partd_phys_source %>% 
         filter(str_detect(doc_cred, self$exclusion_criteria$doc)) %>% 
         distinct(NPI, .keep_all = TRUE)
       self$study_pop$partd_docs <- nrow(self$partd_phys_source)
+      # filtering specialties to exclude
+      self$partd_phys_source <- self$partd_phys_source %>% 
+        filter(!(doc_specialty %in% exclude_specialites))
+      self$study_pop$partd_specialties_keep <- nrow(self$partd_phys_source)
       # filtering docs in US
       self$partd_phys_source <- self$partd_phys_source %>%
         filter(doc_state %in% self$exclusion_criteria$states)

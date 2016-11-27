@@ -10,15 +10,25 @@ study_pop_library <- R6::R6Class(
   
   public = list(
     
+    source_file_dir = '~/Dropbox/physician_payments/raw_source_data/',
+    processed_file_dir = '~/Dropbox/physician_payments/processed_source_data/',
+    shared_docs_dir = '~/Dropbox/OP2 Documents/',
+    
+    doc_specialty_categories = suppressMessages(
+      readr::read_csv('spec/partd_doc_specialty_tabulation_2014.csv')),
+    
     study_pop = list(partd_docs = NULL,
                      openpay_docs = NULL,
+                     partd_specialties_keep = NULL,
                      partd_us_docs = NULL,
                      valid_brand_docs = NULL,
-                     phys_compare_docs = NULL,
+                     phys_comp_docs = NULL,
                      unq_match_crit_partd_docs = NULL,
                      med_grad_exclude_docs = NULL,
                      unq_match_crit_op_docs = NULL,
                      final_study_docs = NULL),
+    
+    
     exclusion_criteria = list(
       doc = 'M.?D.?|D.?O.?',
       claim_count = 100,
