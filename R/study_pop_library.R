@@ -12,6 +12,7 @@ study_pop_library <- R6::R6Class(
     
     source_file_dir = '~/Dropbox/physician_payments/raw_source_data/',
     processed_file_dir = '~/Dropbox/physician_payments/processed_source_data/',
+    shared_docs_dir = '~/Dropbox/OP2 Documents/',
     
     study_pop = list(partd_docs = NULL,
                      openpay_docs = NULL,
@@ -24,6 +25,8 @@ study_pop_library <- R6::R6Class(
                      final_study_docs = NULL),
     exclusion_criteria = list(
       doc = 'M.?D.?|D.?O.?',
+      specialty_exclusion = readr::read_csv(self$shared_docs_dir,
+                                            'partd_doc_specialty_tabulation_2014.csv'),
       claim_count = 100,
       states = c(state.abb, 'DC'),
       grad_year_limits = c(1910, 2013)
