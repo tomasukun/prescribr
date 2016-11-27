@@ -14,10 +14,10 @@ build_study_group <- R6::R6Class(
   
   public = list(
     year = NULL,
-    partd_combined = data_frame(),
+    partd_docs = data_frame(),
     openpay_docs = data_frame(),
     study_population_docs = data_frame(),
-    study_group = data_frame(), 
+    final_study_group = data_frame(), 
     study_pop = Kmisc::kLoad('data/study_pop.rData'),
     
     initialize = function(yr = '2014') {
@@ -28,7 +28,11 @@ build_study_group <- R6::R6Class(
       self$partd_docs <- Kmisc::kLoad(self$processed_file_dir, self$year, 
                                           '/partd_docs.rData')
       self$openpay_docs <- Kmisc::kLoad(self$processed_file_dir, self$year,
-                                        '/open_payments_docs.rData')
+                                        '/open_payments_docs.rData') %>% 
+        mutate(doc_last_name = toupper(doc_last_name),
+               doc_first_name = toupper(doc_first_name),
+               doc_city = toupper(doc_city),
+               doc_state = toupper(doc_state))
     },
     
     merge_processed_data = function() {
@@ -47,18 +51,18 @@ build_study_group <- R6::R6Class(
         
       # filtering medical school graduation
       self$study_population_docs <- self$study_population_docs %>% 
-        filter(doc_grad_year >= self$exclusion_criteria$grad_year_limits[1] | 
-                 doc_grad_year <= self$exclusion_criteria$grad_year_limits[2])
+        filter(doc_grad_year >= self$exclusion_criteria$grad_year_limits[1], 
+               doc_grad_year <= self$exclusion_criteria$grad_year_limits[2])
+      self$study_pop$med_grad_exclude_docs <- nrow(self$study_population_docs)
       self$study_pop$final_study_docs <- nrow(self$study_population_docs)
-      
     },
   
     save_study_population = function() {
       study_pop <- self$study_pop
-      save(study_pop, 'data/study_pop.rData')
+      save(study_pop, file = 'data/study_pop.rData')
       final_study_population <- self$study_population_docs
-      save(final_study_population, self$processed_file_dir, self$year, 
-           '/final_study_population.rData')
+      save(final_study_population, file = paste0(self$processed_file_dir, self$year, 
+           '/final_study_population.rData'))
     },
     
     build_tables = function() {
