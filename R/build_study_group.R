@@ -59,7 +59,7 @@ build_study_group <- R6::R6Class(
       final_study_population <- self$study_population_docs
       save(final_study_population, self$processed_file_dir, self$year, 
            '/final_study_population.rData')
-    }
+    },
     
     build_tables = function() {
       self$read_processed_tables()
