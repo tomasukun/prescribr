@@ -4,6 +4,7 @@
 #' @import tidyr
 #' @import readr
 #' @import purrr
+#' @importFrom plyr mapvalues
 
 study_pop_library <- R6::R6Class(
   'study_pop_library',
@@ -41,6 +42,14 @@ study_pop_library <- R6::R6Class(
                                'LESCOL', 'LESCOL XL', 'ALTOPREV', 'MEVACOR',
                                'PRAVACHOL', 'ATORVASTATIN CALCIUM', 'FLUVASTATIN SODIUM',
                                'LOVASTATIN', 'PRAVASTATIN SODIUM', 'SIMVASTATIN', sep = '|')
+    ),
+    
+    open_payments_target = c(
+      'CRESTOR' = 'CRESTOR'
+    ),
+    
+    target_drug_manufacturer = c(
+      'CRESTOR' = 'AstraZeneca Pharmaceuticals LP'
     )
     
   )
