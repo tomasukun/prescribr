@@ -12,5 +12,9 @@ Imports:
     dplyr,
     stringr,
     tidyr,
-    readr
+    readr,
+    purrr,
+    Kmisc,
+    plyr,
+    lubridate
 RoxygenNote: 5.0.1
