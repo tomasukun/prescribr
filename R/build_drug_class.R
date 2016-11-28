@@ -96,24 +96,25 @@ build_drug_class <- R6::R6Class(
           filter(!is.na(doc_id)) %>% 
           inner_join(self$open_pay_target, by = 'doc_id') %>% 
           filter(
-            drug_manufacturer == target_drug_manufacturer[names(target_drug_manufacturer) == self$target_drug],
-            (!is.na(payment_drug_1) |
-            !is.na(payment_drug_2) |
-            !is.na(payment_drug_3) |
-            !is.na(payment_drug_4) |
-            !is.na(payment_drug_5) |
-            !is.na(payment_device_1) |
-            !is.na(payment_device_2) |
-            !is.na(payment_device_3) |
-            !is.na(payment_device_4) |
-            !is.na(payment_device_5))
-          )
+            !(drug_manufacturer == self$target_drug_manufacturer[names(self$target_drug_manufacturer) == self$target_drug] &
+              is.na(payment_drug_1) &
+              is.na(payment_drug_2) &
+              is.na(payment_drug_3) &
+              is.na(payment_drug_4) &
+              is.na(payment_drug_5) &
+              is.na(payment_device_1) &
+              is.na(payment_device_2) &
+              is.na(payment_device_3) &
+              is.na(payment_device_4) &
+              is.na(payment_device_5))
+            )
+          
         # number of docs who received a tagged payment
-        self$study_group_pop[[self$drug_class]]$tagged_payment <- distinct(study_group_paid, NPI)
+        self$study_group_pop[[self$drug_class]]$tagged_payment <- nrow(distinct(study_group_paid, NPI))
         study_group_paid <- study_group_paid %>%  
           filter(payment_type == 'Food and Beverage')
         # number of docs who recieved a food and beverage payment
-        self$study_group_pop[[self$drug_class]]$meal_payment <- distinct(study_group_paid, NPI)
+        self$study_group_pop[[self$drug_class]]$meal_payment <- nrow(distinct(study_group_paid, NPI))
         
         # distinct TARGET PAID docs
         study_group_target_paid <- study_group_paid %>% 
