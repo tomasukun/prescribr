@@ -26,7 +26,8 @@ build_openpay_year <- R6::R6Class(
         paste0(self$source_file_dir, self$openpay_folder, '/',
                self$year, '/OP_DTL_GNRL_PGYR', self$year, '_P06302016.csv')
         ) %>% 
-        filter(Dispute_Status_for_Publication == 'No') %>% 
+        filter(Dispute_Status_for_Publication == 'No',
+               Third_Party_Payment_Recipient_Indicator == 'No Third Party Payment') %>% 
         select(doc_id = Physician_Profile_ID,
                doc_last_name = Physician_Last_Name,
                doc_first_name = Physician_First_Name,
@@ -39,6 +40,7 @@ build_openpay_year <- R6::R6Class(
                payment_date = Date_of_Payment,
                payment_number = Number_of_Payments_Included_in_Total_Amount,
                payment_type = Nature_of_Payment_or_Transfer_of_Value,
+               payment_type_context = Contextual_Information,
                payment_drug_1 = Name_of_Associated_Covered_Drug_or_Biological1,
                payment_drug_2 = Name_of_Associated_Covered_Drug_or_Biological2,
                payment_drug_3 = Name_of_Associated_Covered_Drug_or_Biological3,
