@@ -43,16 +43,16 @@ build_prescriber_year <- R6::R6Class(
       self$partd_phys_source = readr::read_delim(
         paste0(self$source_file_dir, self$phys_folder, '/', self$year, 
                '/PartD_Prescriber_PUF_NPI.txt'), delim = '\t') %>% 
-        select(NPI, 
+        select(doc_zip = starts_with('NPPES_PROVIDER_ZIP5'),
+               NPI, 
+               doc_specialty = starts_with('SPECIALTY_DESC'),
+               doc_city = NPPES_PROVIDER_CITY,
                doc_last_name = NPPES_PROVIDER_LAST_ORG_NAME,
                doc_first_name = NPPES_PROVIDER_FIRST_NAME,
                doc_mi = NPPES_PROVIDER_MI,
                doc_cred = NPPES_CREDENTIALS,
                doc_gender = NPPES_PROVIDER_GENDER,
-               doc_city = NPPES_PROVIDER_CITY,
-               doc_zip = NPPES_PROVIDER_ZIP5,
                doc_state = NPPES_PROVIDER_STATE,
-               doc_specialty = SPECIALTY_DESCRIPTION,
                doc_bene_count = BENE_COUNT,
                doc_total_claims = TOTAL_CLAIM_COUNT,
                doc_total_drug_cost = TOTAL_DRUG_COST,
@@ -74,7 +74,7 @@ build_prescriber_year <- R6::R6Class(
                )
       # read phys compare files
       self$phys_compare_source = readr::read_csv(
-        paste0(self$source_file_dir, self$phys_comp_folder, '/', self$year, 
+        paste0(self$source_file_dir, self$phys_comp_folder, '/2014', 
                '/Physician_Compare_National_Downloadable_File.csv'), col_names = TRUE) %>% 
         distinct(NPI, .keep_all = TRUE) %>% 
         select(NPI, 
