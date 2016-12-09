@@ -34,6 +34,11 @@ Source: CRAN
 Version: 0.12.8
 Hash: 436ad5c23fad4e22224c7ac2fc82b049
 
+Package: RcppEigen
+Source: CRAN
+Version: 0.3.2.9.0
+Requires: Rcpp
+
 Package: assertthat
 Source: CRAN
 Version: 0.1
@@ -94,6 +99,11 @@ Version: 0.10
 Hash: c3601a10c987d439e0c63ec635234a76
 Requires: stringr
 
+Package: gee
+Source: CRAN
+Version: 4.13-19
+Hash: 5f8f882028353d612c970437fae1af93
+
 Package: ggplot2
 Source: CRAN
 Version: 2.2.0
@@ -147,6 +157,12 @@ Source: CRAN
 Version: 0.2.0
 Hash: 3d6e7608e65bbf5cb170dab1e3c9ed8b
 
+Package: lme4
+Source: CRAN
+Version: 1.1-12
+Hash: fb509e21a0f69942bf918fd9a0d335a4
+Requires: Rcpp, RcppEigen, minqa, nloptr
+
 Package: lubridate
 Source: CRAN
 Version: 1.6.0
@@ -175,11 +191,22 @@ Source: CRAN
 Version: 0.5
 Hash: 463550cf44fb6f0a2359368f42eebe62
 
+Package: minqa
+Source: CRAN
+Version: 1.2.4
+Hash: 880cf962f1a3a359a733c42de76f3729
+Requires: Rcpp
+
 Package: munsell
 Source: CRAN
 Version: 0.4.3
 Hash: f96d896947fcaf9b6d0074002e9f4f9d
 Requires: colorspace
+
+Package: nloptr
+Source: CRAN
+Version: 1.0.4
+Hash: 8053df240a4635aeb54fc68c6de67709
 
 Package: openssl
 Source: CRAN
