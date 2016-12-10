@@ -37,6 +37,7 @@ Hash: 436ad5c23fad4e22224c7ac2fc82b049
 Package: RcppEigen
 Source: CRAN
 Version: 0.3.2.9.0
+Hash: 190c54763f088d4e8684d69ffb56a9c3
 Requires: Rcpp
 
 Package: assertthat
@@ -160,7 +161,7 @@ Hash: 3d6e7608e65bbf5cb170dab1e3c9ed8b
 Package: lme4
 Source: CRAN
 Version: 1.1-12
-Hash: fb509e21a0f69942bf918fd9a0d335a4
+Hash: 71d6bd20eb374245f7b852e9b4995f22
 Requires: Rcpp, RcppEigen, minqa, nloptr
 
 Package: lubridate
