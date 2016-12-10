@@ -1,5 +1,5 @@
 Package: prescribr
-Title: Analysis of industry payments to physicians and their prescribing.
+Title: Analysis of industry payments to physicians and their prescribing behavior
 Version: 0.0.0.9000
 Authors@R: person("Thomas", "Aguilar", email = "taguilar87@gmail.com", role = c("aut", "cre"))
 Description: What the package does (one paragraph).
