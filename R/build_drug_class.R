@@ -154,7 +154,7 @@ build_drug_class <- R6::R6Class(
       
       final_study_group <- self$final_study_group
       save(final_study_group,
-           file = paste0('data/source_tables/', 'study_group_', self$drug_class, '.rData'))
+           file = paste0('data/source_tables/', 'study_group_', self$drug_class, '_', self$year, '.rData'))
     },
     
     build_tables = function() {
