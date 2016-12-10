@@ -73,7 +73,7 @@ build_drug_class <- R6::R6Class(
         distinct(NPI, .keep_all = TRUE) %>% 
         ungroup()
       # number of docs with over 100 claims in class
-      self$study_group_pop[[self$drug_class]]$claim_count_100plus <- nrow(self$final_study_group)
+      self$study_group_pop[[paste0(self$drug_class, '_', self$year)]]$claim_count_100plus <- nrow(self$final_study_group)
         
     },
     
@@ -110,11 +110,11 @@ build_drug_class <- R6::R6Class(
             )
           
         # number of docs who received a tagged payment
-        self$study_group_pop[[self$drug_class]]$tagged_payment <- nrow(distinct(study_group_paid, NPI))
+        self$study_group_pop[[paste0(self$drug_class, '_', self$year)]]$tagged_payment <- nrow(distinct(study_group_paid, NPI))
         study_group_paid <- study_group_paid %>%  
           filter(payment_type == 'Food and Beverage')
         # number of docs who recieved a food and beverage payment
-        self$study_group_pop[[self$drug_class]]$meal_payment <- nrow(distinct(study_group_paid, NPI))
+        self$study_group_pop[[paste0(self$drug_class, '_', self$year)]]$meal_payment <- nrow(distinct(study_group_paid, NPI))
         
         # distinct TARGET PAID docs
         study_group_target_paid <- study_group_paid %>% 
