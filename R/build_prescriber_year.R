@@ -92,23 +92,23 @@ build_prescriber_year <- R6::R6Class(
       self$partd_phys_source <- self$partd_phys_source %>% 
         filter(str_detect(doc_cred, self$exclusion_criteria$doc)) %>% 
         distinct(NPI, .keep_all = TRUE)
-      self$study_pop$partd_docs <- nrow(self$partd_phys_source)
+      self$study_pop[[paste0('study_', self$year)]]$partd_docs <- nrow(self$partd_phys_source)
       # filtering specialties to exclude
       self$partd_phys_source <- self$partd_phys_source %>% 
         filter(!(doc_specialty %in% exclude_specialites))
-      self$study_pop$partd_specialties_keep <- nrow(self$partd_phys_source)
+      self$study_pop[[paste0('study_', self$year)]]$partd_specialties_keep <- nrow(self$partd_phys_source)
       # filtering docs in US
       self$partd_phys_source <- self$partd_phys_source %>%
         filter(doc_state %in% self$exclusion_criteria$states)
-      self$study_pop$partd_us_docs <- nrow(self$partd_phys_source)
+      self$study_pop[[paste0('study_', self$year)]]$partd_us_docs <- nrow(self$partd_phys_source)
       # filtering docs with valid brand count
       self$partd_phys_source <- self$partd_phys_source %>%
         filter(!is.na(doc_brand_claims))
-      self$study_pop$valid_brand_docs <- nrow(self$partd_phys_source)
+      self$study_pop[[paste0('study_', self$year)]]$valid_brand_docs <- nrow(self$partd_phys_source)
       # filtering docs in phys compare
       self$partd_phys_source <- self$partd_phys_source %>%
         inner_join(self$phys_compare_source, by = 'NPI')
-      self$study_pop$phys_comp_docs <- nrow(self$partd_phys_source)
+      self$study_pop[[paste0('study_', self$year)]]$phys_comp_docs <- nrow(self$partd_phys_source)
       # filtering docs with identical matching criteria
       self$partd_phys_source <- self$partd_phys_source %>%
         group_by(doc_last_name, doc_first_name,
@@ -116,7 +116,7 @@ build_prescriber_year <- R6::R6Class(
         mutate(dup_count = n()) %>% 
         filter(dup_count == 1) %>% 
         ungroup()
-      self$study_pop$unq_match_crit_partd_docs <- nrow(self$partd_phys_source)
+      self$study_pop[[paste0('study_', self$year)]]$unq_match_crit_partd_docs <- nrow(self$partd_phys_source)
     },
     
     merge_partd_phys_drugs = function() {

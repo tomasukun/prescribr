@@ -64,7 +64,7 @@ build_openpay_year <- R6::R6Class(
                total_payment_dollars) %>% 
         distinct(doc_id, .keep_all = TRUE)
       study_pop <- Kmisc::kLoad('data/study_pop.rData')
-      study_pop$openpay_docs <- nrow(self$openpay_docs)
+      study_pop[[paste0('study_', self$year)]]$openpay_docs <- nrow(self$openpay_docs)
     },
     
     save_processed_tables = function() {
