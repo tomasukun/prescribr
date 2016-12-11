@@ -4,7 +4,6 @@
 #' @import tidyr
 #' @import readr
 #' @import purrr
-#' @importFrom plyr mapvalues
 
 study_pop_library <- R6::R6Class(
   'study_pop_library',
@@ -18,19 +17,40 @@ study_pop_library <- R6::R6Class(
     doc_specialty_categories = suppressMessages(
       readr::read_csv('spec/partd_doc_specialty_tabulation_2014.csv')),
     
-    study_pop = list(partd_docs = NULL,
-                     openpay_docs = NULL,
-                     partd_specialties_keep = NULL,
-                     partd_us_docs = NULL,
-                     valid_brand_docs = NULL,
-                     phys_comp_docs = NULL,
-                     unq_match_crit_partd_docs = NULL,
-                     med_grad_exclude_docs = NULL,
-                     unq_match_crit_op_docs = NULL,
-                     final_study_docs = NULL),
+    study_pop = list(
+      study_2013 = list(
+        partd_docs = NULL,
+        openpay_docs = NULL,
+        partd_specialties_keep = NULL,
+        partd_us_docs = NULL,
+        valid_brand_docs = NULL,
+        phys_comp_docs = NULL,
+        unq_match_crit_partd_docs = NULL,
+        med_grad_exclude_docs = NULL,
+        unq_match_crit_op_docs = NULL,
+        final_study_docs = NULL
+        ),
+      study_2014 = list(
+        partd_docs = NULL,
+        openpay_docs = NULL,
+        partd_specialties_keep = NULL,
+        partd_us_docs = NULL,
+        valid_brand_docs = NULL,
+        phys_comp_docs = NULL,
+        unq_match_crit_partd_docs = NULL,
+        med_grad_exclude_docs = NULL,
+        unq_match_crit_op_docs = NULL,
+        final_study_docs = NULL
+      )
+    ),
     
     study_group_pop = list(
-      statins = list(
+      statins_2013 = list(
+        claim_count_100plus = NULL,
+        meal_payment = NULL,
+        tagged_payment = NULL
+      ),
+      statins_2014 = list(
         claim_count_100plus = NULL,
         meal_payment = NULL,
         tagged_payment = NULL
@@ -52,12 +72,11 @@ study_pop_library <- R6::R6Class(
     ),
     
     open_payments_target = c(
-      'CRESTOR' = 'CRESTOR'
+      'crestor' = 'CRESTOR'
     ),
     
     target_drug_manufacturer = c(
-      'CRESTOR' = 'AstraZeneca Pharmaceuticals LP'
+      'crestor' = 'AstraZeneca Pharmaceuticals LP'
     )
-    
   )
 )

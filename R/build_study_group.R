@@ -18,7 +18,6 @@ build_study_group <- R6::R6Class(
     openpay_docs = data_frame(),
     study_population_docs = data_frame(),
     final_study_group = data_frame(), 
-    study_pop = Kmisc::kLoad('data/study_pop.rData'),
     
     initialize = function(yr = '2014') {
       self$year <- yr
@@ -41,24 +40,26 @@ build_study_group <- R6::R6Class(
     },
 
     filter_processed_data = function() {
+      # loading study pop
+      study_pop <- Kmisc::kLoad('data/study_pop.rData')
+      
       # filtering duplicate Open Payment Doc matching criteria
       self$study_population_docs <- self$study_population_docs %>% 
         group_by(NPI) %>% 
         mutate(dup_count = n()) %>% 
         filter(dup_count == 1) %>% 
         ungroup()
-      self$study_pop$unq_match_crit_op_docs <- nrow(self$study_population_docs)
+      study_pop[[paste0('study_', self$year)]]$unq_match_crit_op_docs <- nrow(self$study_population_docs)
         
       # filtering medical school graduation
       self$study_population_docs <- self$study_population_docs %>% 
         filter(doc_grad_year >= self$exclusion_criteria$grad_year_limits[1], 
                doc_grad_year <= self$exclusion_criteria$grad_year_limits[2])
-      self$study_pop$med_grad_exclude_docs <- nrow(self$study_population_docs)
-      self$study_pop$final_study_docs <- nrow(self$study_population_docs)
+      study_pop[[paste0('study_', self$year)]]$med_grad_exclude_docs <- nrow(self$study_population_docs)
+      study_pop[[paste0('study_', self$year)]]$final_study_docs <- nrow(self$study_population_docs)
     },
   
     save_study_population = function() {
-      study_pop <- self$study_pop
       save(study_pop, file = 'data/study_pop.rData')
       final_study_population <- self$study_population_docs
       save(final_study_population, file = paste0(self$processed_file_dir, self$year, 

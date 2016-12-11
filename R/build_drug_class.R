@@ -19,11 +19,15 @@ build_drug_class <- R6::R6Class(
     open_pay_target = data_frame(),
     drug_class = NULL,
     target_drug = NULL,
+    target_manufacturer = NULL,
     
-    initialize = function(yr = '2014', class = 'statins', target_drug = 'CRESTOR') {
+    initialize = function(yr = '2014', class = 'statins', target_drug = 'crestor') {
       self$year <- yr
       self$drug_class <- class
-      self$target_drug <- target_drug
+      self$target_drug <- plyr::mapvalues(names(self$open_payments_target),
+                                          target_drug, self$open_payments_target)
+      self$target_manufacturer <- plyr::mapvalues(names(self$target_drug_manufacturer),
+                                                  target_drug, self$target_drug_manufacturer)
     },
     
     read_partd_drug_class = function() {
@@ -73,7 +77,7 @@ build_drug_class <- R6::R6Class(
         distinct(NPI, .keep_all = TRUE) %>% 
         ungroup()
       # number of docs with over 100 claims in class
-      self$study_group_pop[[self$drug_class]]$claim_count_100plus <- nrow(self$final_study_group)
+      self$study_group_pop[[paste0(self$drug_class, '_', self$year)]]$claim_count_100plus <- nrow(self$final_study_group)
         
     },
     
@@ -96,7 +100,7 @@ build_drug_class <- R6::R6Class(
           filter(!is.na(doc_id)) %>% 
           inner_join(self$open_pay_target, by = 'doc_id') %>% 
           filter(
-            !(drug_manufacturer == self$target_drug_manufacturer[names(self$target_drug_manufacturer) == self$target_drug] &
+            !(drug_manufacturer == self$target_manufacturer &
               is.na(payment_drug_1) &
               is.na(payment_drug_2) &
               is.na(payment_drug_3) &
@@ -110,11 +114,11 @@ build_drug_class <- R6::R6Class(
             )
           
         # number of docs who received a tagged payment
-        self$study_group_pop[[self$drug_class]]$tagged_payment <- nrow(distinct(study_group_paid, NPI))
+        self$study_group_pop[[paste0(self$drug_class, '_', self$year)]]$tagged_payment <- nrow(distinct(study_group_paid, NPI))
         study_group_paid <- study_group_paid %>%  
           filter(payment_type == 'Food and Beverage')
         # number of docs who recieved a food and beverage payment
-        self$study_group_pop[[self$drug_class]]$meal_payment <- nrow(distinct(study_group_paid, NPI))
+        self$study_group_pop[[paste0(self$drug_class, '_', self$year)]]$meal_payment <- nrow(distinct(study_group_paid, NPI))
         
         # distinct TARGET PAID docs
         study_group_target_paid <- study_group_paid %>% 
@@ -154,7 +158,7 @@ build_drug_class <- R6::R6Class(
       
       final_study_group <- self$final_study_group
       save(final_study_group,
-           file = paste0('data/source_tables/', 'study_group_', self$drug_class, '.rData'))
+           file = paste0('data/source_tables/', 'study_group_', self$drug_class, '_', self$year, '.rData'))
     },
     
     build_tables = function() {
