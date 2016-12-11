@@ -49,14 +49,14 @@ build_study_group <- R6::R6Class(
         mutate(dup_count = n()) %>% 
         filter(dup_count == 1) %>% 
         ungroup()
-      self$study_pop[[paste0('study_', self$year)]]$unq_match_crit_op_docs <- nrow(self$study_population_docs)
+      study_pop[[paste0('study_', self$year)]]$unq_match_crit_op_docs <- nrow(self$study_population_docs)
         
       # filtering medical school graduation
       self$study_population_docs <- self$study_population_docs %>% 
         filter(doc_grad_year >= self$exclusion_criteria$grad_year_limits[1], 
                doc_grad_year <= self$exclusion_criteria$grad_year_limits[2])
-      self$study_pop[[paste0('study_', self$year)]]$med_grad_exclude_docs <- nrow(self$study_population_docs)
-      self$study_pop[[paste0('study_', self$year)]]$final_study_docs <- nrow(self$study_population_docs)
+      study_pop[[paste0('study_', self$year)]]$med_grad_exclude_docs <- nrow(self$study_population_docs)
+      study_pop[[paste0('study_', self$year)]]$final_study_docs <- nrow(self$study_population_docs)
     },
   
     save_study_population = function() {
