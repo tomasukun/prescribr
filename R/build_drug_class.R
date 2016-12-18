@@ -123,13 +123,17 @@ build_drug_class <- R6::R6Class(
         self$study_group_pop[[paste0(self$drug_class, '_', self$year)]]$meal_payment <- nrow(distinct(study_group_paid, NPI))
         
         # distinct TARGET PAID docs
+        target_drug_regex <- str_c(self$target_drug, tolower(self$target_drug),
+                                    str_replace(tolower(self$target_drug), str_sub(tolower(self$target_drug), 1, 1), 
+                                                toupper(str_sub(self$target_drug, 1, 1))), 
+                                    sep = '|')
         study_group_target_paid <- study_group_paid %>% 
           filter(
-            (str_detect(payment_drug_1, self$target_drug) |
-               str_detect(payment_drug_2, self$target_drug) |
-               str_detect(payment_drug_3, self$target_drug) |
-               str_detect(payment_drug_4, self$target_drug) |
-               str_detect(payment_drug_5, self$target_drug))
+            (str_detect(payment_drug_1, target_drug_regex) |
+               str_detect(payment_drug_2, target_drug_regex) |
+               str_detect(payment_drug_3, target_drug_regex) |
+               str_detect(payment_drug_4, target_drug_regex) |
+               str_detect(payment_drug_5, target_drug_regex))
           ) %>% 
           group_by(NPI) %>% 
           mutate(
