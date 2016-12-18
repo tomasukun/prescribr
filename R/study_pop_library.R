@@ -68,15 +68,36 @@ study_pop_library <- R6::R6Class(
       statins = stringr::str_c('LIVALO', 'CRESTOR', 'LIPITOR', 'ZOCOR',
                                'LESCOL', 'LESCOL XL', 'ALTOPREV', 'MEVACOR',
                                'PRAVACHOL', 'ATORVASTATIN CALCIUM', 'FLUVASTATIN SODIUM',
-                               'LOVASTATIN', 'PRAVASTATIN SODIUM', 'SIMVASTATIN', sep = '|')
+                               'LOVASTATIN', 'PRAVASTATIN SODIUM', 'SIMVASTATIN', sep = '|'),
+      anti_mrsa = stringr::str_c('CLEOCIN HCL', 'CLINDAMYCIN HCL', 'CLEOCIN PALMITATE',
+                                 'CLINDAMYCIN PALMITATE HCL', 'CLINDAMYCIN PEDIATRIC', 'BACTRIM',
+                                 'SULFAMETHOXAZOLE-TRIMETHOPRIM', 'BACTRIM DS', 'SULFATRIM',
+                                 'ZYVOX', 'SIVEXTRO', 'VIBRAMYCIN', 'DOXY 100', 'DORYX', 'DOXYCYCLINE HYCLATE',
+                                 'MORGIDOX', 'ORACEA', 'DOXYCYCLINE MONOHYDRATE', 'MINOCIN', 'SOLODYN', 
+                                 'MINOCYCLINE HCL', sep = '|'),
+      opthalmic_corticosteroid = stringr::str_c('MAXIDEX', 'DEXAMETHASONE SODIUM PHOSPHATE', 'DUREZOL', 
+                                                'FLUOROMETHOLONE', 'FML FORTE', 'FML', 'FML S.O.P', 
+                                                'FLAREX', 'LOTEMAX', 'PRED FORTE', 'PRED MILD', 
+                                                'PREDNISOLONE ACETATE', 'OMNIPRED', 'PREDNISOLONE SODIUM PHOSPHATE',
+                                                'VEXOL'),
+      osteoporosis = stringr::str_c('ALENDRONATE SODIUM', 'BINOSTO', 'FOSAMAX', 'FOSAMAX PLUS D',
+                                    'IBANDRONATE SODIUM', 'BONIVA', 'ATELVIA', 'ACTONEL', 
+                                    'RISEDRONATE SODIUM', 'ZOLEDRONIC ACID', 'ZOMETA', 'RECLAST',
+                                    'PROLIA', 'FORTEO', 'RALOXIFENE HCL', 'EVISTA', sep = '|')
     ),
     
     open_payments_target = c(
-      'crestor' = 'CRESTOR'
+      'crestor' = 'CRESTOR',
+      'zyvox' = 'ZYVOX',
+      'durezol' = 'DUREZOL',
+      'prolia' = 'PROLIA'
     ),
     
     target_drug_manufacturer = c(
-      'crestor' = 'AstraZeneca Pharmaceuticals LP'
+      'crestor' = 'AstraZeneca Pharmaceuticals LP',
+      'zyvox' = 'Pfizer',
+      'durezol' = 'Alcon',
+      'prolia' = 'Amgen Inc.|Medtronic Sofamor Danek USA, Inc.'
     )
   )
 )
