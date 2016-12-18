@@ -79,7 +79,7 @@ study_pop_library <- R6::R6Class(
                                                 'FLUOROMETHOLONE', 'FML FORTE', 'FML', 'FML S.O.P', 
                                                 'FLAREX', 'LOTEMAX', 'PRED FORTE', 'PRED MILD', 
                                                 'PREDNISOLONE ACETATE', 'OMNIPRED', 'PREDNISOLONE SODIUM PHOSPHATE',
-                                                'VEXOL'),
+                                                'VEXOL', sep = '|'),
       osteoporosis = stringr::str_c('ALENDRONATE SODIUM', 'BINOSTO', 'FOSAMAX', 'FOSAMAX PLUS D',
                                     'IBANDRONATE SODIUM', 'BONIVA', 'ATELVIA', 'ACTONEL', 
                                     'RISEDRONATE SODIUM', 'ZOLEDRONIC ACID', 'ZOMETA', 'RECLAST',
