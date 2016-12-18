@@ -24,10 +24,12 @@ build_drug_class <- R6::R6Class(
     initialize = function(yr = '2014', class = 'statins', target_drug = 'crestor') {
       self$year <- yr
       self$drug_class <- class
-      self$target_drug <- plyr::mapvalues(names(self$open_payments_target),
-                                          target_drug, self$open_payments_target)
-      self$target_manufacturer <- plyr::mapvalues(names(self$target_drug_manufacturer),
-                                                  target_drug, self$target_drug_manufacturer)
+      self$target_drug <- plyr::mapvalues(target_drug,
+                                          names(self$open_payments_target),
+                                          self$open_payments_target)
+      self$target_manufacturer <- plyr::mapvalues(target_drug,
+                                                  names(self$target_drug_manufacturer),
+                                                  self$target_drug_manufacturer)
     },
     
     read_partd_drug_class = function() {
@@ -100,7 +102,7 @@ build_drug_class <- R6::R6Class(
           filter(!is.na(doc_id)) %>% 
           inner_join(self$open_pay_target, by = 'doc_id') %>% 
           filter(
-            !(drug_manufacturer == self$target_manufacturer &
+            !(stringr::str_detect(drug_manufacturer, self$target_manufacturer) &
               is.na(payment_drug_1) &
               is.na(payment_drug_2) &
               is.na(payment_drug_3) &
