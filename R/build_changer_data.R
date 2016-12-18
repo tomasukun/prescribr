@@ -95,20 +95,19 @@ build_changer_data <- R6::R6Class(
                       -base_year_class_claims, -base_year_target_claims,
                       -change_year_class_claims, -change_year_target_claims) %>%
         group_by(NPI, year, paid_group) %>%
-        summarise(prescribing_rate = ifelse(year == self$base_year,
-                                            round(base_year_target_claims/base_year_class_claims, 2),
-                                            round(change_year_target_claims/change_year_class_claims, 2))
-                  
-        ) %>%
+        summarise(target_claims = ifelse(year == self$base_year,
+                                        base_year_target_claims,
+                                        change_year_target_claims)) %>%
         ungroup() %>%
         group_by(year, paid_group) %>%
         summarise(
           group_count = n(),
-          p10_prescribing_rate  = quantile(prescribing_rate, probs = 0.1),
-          p25_prescribing_rate  = quantile(prescribing_rate, probs = 0.25),
-          mean_prescribing_rate = round(100*mean(prescribing_rate), 2),
-          p75_prescribing_rate  = quantile(prescribing_rate, probs = 0.75),
-          p90_prescribing_rate  = quantile(prescribing_rate, probs = 0.9)
+          total_claims = sum(target_claims, na.rm = TRUE),
+          p10_prescribing_rate  = quantile(target_claims, probs = 0.1),
+          p25_prescribing_rate  = quantile(target_claims, probs = 0.25),
+          mean_prescribing_rate = round(100*mean(target_claims), 2),
+          p75_prescribing_rate  = quantile(target_claims, probs = 0.75),
+          p90_prescribing_rate  = quantile(target_claims, probs = 0.9)
         )
         
     },
@@ -124,33 +123,47 @@ build_changer_data <- R6::R6Class(
       self$merge_source_data()
       self$tidy_combined_data()
       if(self$create_figure == TRUE) {
+        figure_data <- self$tidy_data %>%
+          select(year, paid_group, total_claims) %>% 
+          tidyr::spread(year, total_claims) %>% 
+          mutate(percent_diff = round(100*(`2014` - `2013`)/`2013`))
+        percent_increase <- data_frame(
+          x_pos = rep(2.13, 4),
+          y_pos = 1.001*(figure_data$`2014`),
+          increase = str_c(figure_data$percent_diff, '%')
+        )
         figure1 <- ggplot2::ggplot(self$tidy_data, 
-                                   aes(x = year, y = mean_prescribing_rate, group = paid_group, colour = paid_group)) +
-          geom_line(size = 1) +
-          geom_point(size = 5, shape = 21, fill = "white") + 
+                                   aes(x = year, y = total_claims, group = paid_group, colour = paid_group)) +
+          geom_line(size = 1.12) +
+          geom_point(size = 5.2, shape = 21, fill = "white") + 
+          annotate("text",
+                   label = percent_increase$increase,
+                   x = percent_increase$x_pos,
+                   y = percent_increase$y_pos,
+                   size = 7) +
           scale_colour_manual(
                               breaks = c('No Meals', 'Base Year Meal',
                                          'Change Year Meal', 'Both Year Meals'),
-                              values = c('No Meals' = '#d4c0ef',
-                                         'Base Year Meal' = '#b491e4',
-                                         'Change Year Meal' = '#8952d4',
-                                         'Both Year Meals' = '#7333cc')
+                              values = c('No Meals' = '#FFC300',
+                                         'Base Year Meal' = '#FF5733',
+                                         'Change Year Meal' = '#C70039',
+                                         'Both Year Meals' = '#581845')
                               ) +
-          ylab("Rosuvastatin(Crestor \U00AE) Prescribing Rate among Statins, % \n") + 
+          ylab("Denosumab(Prolia \U00AE) Claims, # \n") + 
           labs(color = "Meal Payment Group") + 
           theme(legend.text = element_text(size = 18)) + 
           theme(legend.title = element_text(size = 18)) + 
           theme(legend.key.size = unit(1.5, "cm")) + 
-          scale_y_continuous(limits = c(2, 8), breaks = seq(2, 8, 0.5), expand = c(0,0)) +
+          scale_y_continuous(limits = c(350, 7500), breaks = seq(350, 7500, 500), expand = c(0,0)) +
           theme(axis.text = element_text(face = "bold", size = 17, colour = "black")) +
-          theme(panel.background = element_rect(colour = "#e9e9e9", fill = "#e9e9e9")) +
+          theme(panel.background = element_rect(colour = "white", fill = "white")) +
           theme(axis.line = element_line(colour = "black")) +
           theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), 
                 panel.grid.minor.y = element_blank()) +
-          theme(panel.grid.major.y = element_line(colour = "grey80")) +
+          theme(panel.grid.major.y = element_line(colour = "grey90")) +
           theme(axis.ticks = element_line(colour = "black")) + 
           theme(axis.title = element_text(hjust = 0.5)) +
-          ggtitle("Rosuvastatin") +
+          ggtitle("Prolia") +
           theme(title = element_text( size = 18, color = "black", hjust = 0.5, face = "bold"))
         browser()
         # jpeg(filename = paste0(self$shared_docs_dir, 'figure1_changer_analysis_', self$drug_class, '.jpeg'), 
