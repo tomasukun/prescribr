@@ -139,12 +139,12 @@ build_changer_data <- R6::R6Class(
                                          'Change Year Meal' = '#C70039',
                                          'Both Year Meals' = '#581845')
                               ) +
-          ylab("Denosumab (Prolia \U00AE) Prescribing Rate, # per Physician \n") + 
+          ylab("Diclofenac (Flector \U00AE) Prescribing Rate, # per Physician \n") + 
           labs(color = "Meal Payment Group") + 
           theme(legend.text = element_text(size = 18)) + 
           theme(legend.title = element_text(size = 18)) + 
           theme(legend.key.size = unit(1.5, "cm")) + 
-          scale_y_continuous(limits = c(0, 6), breaks = seq(0, 6, 0.5), expand = c(0,0)) +
+          scale_y_continuous(limits = c(0, 1.5), breaks = seq(0, 1.5, 0.1), expand = c(0,0)) +
           theme(axis.text = element_text(face = "bold", size = 17, colour = "black")) +
           theme(panel.background = element_rect(colour = "white", fill = "white")) +
           theme(axis.line = element_line(colour = "black")) +
@@ -153,7 +153,7 @@ build_changer_data <- R6::R6Class(
           theme(panel.grid.major.y = element_line(colour = "grey90")) +
           theme(axis.ticks = element_line(colour = "black")) + 
           theme(axis.title = element_text(hjust = 0.5)) +
-          ggtitle("Prolia") +
+          ggtitle("Flector") +
           theme(title = element_text( size = 18, color = "black", hjust = 0.5, face = "bold"))
         browser()
         # jpeg(filename = paste0(self$shared_docs_dir, 'figure1_changer_analysis_', self$drug_class, '.jpeg'), 
