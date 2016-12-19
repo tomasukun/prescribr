@@ -24,10 +24,12 @@ build_drug_class <- R6::R6Class(
     initialize = function(yr = '2014', class = 'statins', target_drug = 'crestor') {
       self$year <- yr
       self$drug_class <- class
-      self$target_drug <- plyr::mapvalues(names(self$open_payments_target),
-                                          target_drug, self$open_payments_target)
-      self$target_manufacturer <- plyr::mapvalues(names(self$target_drug_manufacturer),
-                                                  target_drug, self$target_drug_manufacturer)
+      self$target_drug <- plyr::mapvalues(target_drug,
+                                          names(self$open_payments_target),
+                                          self$open_payments_target)
+      self$target_manufacturer <- plyr::mapvalues(target_drug,
+                                                  names(self$target_drug_manufacturer),
+                                                  self$target_drug_manufacturer)
     },
     
     read_partd_drug_class = function() {
@@ -100,7 +102,7 @@ build_drug_class <- R6::R6Class(
           filter(!is.na(doc_id)) %>% 
           inner_join(self$open_pay_target, by = 'doc_id') %>% 
           filter(
-            !(drug_manufacturer == self$target_manufacturer &
+            !(stringr::str_detect(drug_manufacturer, self$target_manufacturer) &
               is.na(payment_drug_1) &
               is.na(payment_drug_2) &
               is.na(payment_drug_3) &
@@ -121,13 +123,17 @@ build_drug_class <- R6::R6Class(
         self$study_group_pop[[paste0(self$drug_class, '_', self$year)]]$meal_payment <- nrow(distinct(study_group_paid, NPI))
         
         # distinct TARGET PAID docs
+        target_drug_regex <- str_c(self$target_drug, tolower(self$target_drug),
+                                    str_replace(tolower(self$target_drug), str_sub(tolower(self$target_drug), 1, 1), 
+                                                toupper(str_sub(self$target_drug, 1, 1))), 
+                                    sep = '|')
         study_group_target_paid <- study_group_paid %>% 
           filter(
-            (str_detect(payment_drug_1, self$target_drug) |
-               str_detect(payment_drug_2, self$target_drug) |
-               str_detect(payment_drug_3, self$target_drug) |
-               str_detect(payment_drug_4, self$target_drug) |
-               str_detect(payment_drug_5, self$target_drug))
+            (str_detect(payment_drug_1, target_drug_regex) |
+               str_detect(payment_drug_2, target_drug_regex) |
+               str_detect(payment_drug_3, target_drug_regex) |
+               str_detect(payment_drug_4, target_drug_regex) |
+               str_detect(payment_drug_5, target_drug_regex))
           ) %>% 
           group_by(NPI) %>% 
           mutate(
