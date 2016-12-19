@@ -6,6 +6,7 @@
 #' @import readr
 #' @import purrr
 #' @import lubridate
+#' @import ggplot2
 #' @importFrom Kmisc kLoad
  
 build_changer_data <- R6::R6Class(
@@ -59,29 +60,6 @@ build_changer_data <- R6::R6Class(
     },
     
     tidy_combined_data = function() {
-      # self$tidy_data <- self$combined_data %>% 
-        # tidyr::gather(key = 'year_vars', value = 'year', base_year, change_year,
-        #               -base_year_class_claims, -base_year_target_claims,
-        #               -change_year_class_claims, -change_year_target_claims) %>%
-        # group_by(NPI, year) %>%
-        # summarise(prescribing_rate = ifelse(year == self$base_year,
-        #                                     round(base_year_target_claims/base_year_class_claims, 2),
-        #                                     round(change_year_target_claims/change_year_class_claims, 2)),
-        #           paid = ifelse(year == self$base_year,
-        #                         base_year_payments,  change_year_payments)
-        # 
-        # ) %>%
-        # ungroup() %>%
-      #   mutate(paid = ifelse(is.na(paid), 'Not Paid', 'Paid')) %>% 
-      #   group_by(year, paid) %>% 
-      #   summarise(
-      #     mean_prescribing_rate = mean(prescribing_rate, na.rm = TRUE),
-      #     sd_prescribing_rate = sd(prescribing_rate, na.rm = TRUE),
-      #     n = n()
-      #   ) %>% 
-      #   mutate(
-      #     moe = sqrt(mean_prescribing_rate*(1-mean_prescribing_rate)/n)*qnorm(0.975)
-      #   )
       
       self$tidy_data <- self$combined_data %>% 
         mutate(
@@ -97,17 +75,24 @@ build_changer_data <- R6::R6Class(
         group_by(NPI, year, paid_group) %>%
         summarise(target_claims = ifelse(year == self$base_year,
                                         base_year_target_claims,
-                                        change_year_target_claims)) %>%
+                                        change_year_target_claims),
+                  class_claims = ifelse(year == self$base_year,
+                                        base_year_class_claims,
+                                        change_year_class_claims)) %>%
         ungroup() %>%
         group_by(year, paid_group) %>%
         summarise(
           group_count = n(),
           total_claims = sum(target_claims, na.rm = TRUE),
-          p10_prescribing_rate  = quantile(target_claims, probs = 0.1),
-          p25_prescribing_rate  = quantile(target_claims, probs = 0.25),
-          mean_prescribing_rate = round(100*mean(target_claims), 2),
-          p75_prescribing_rate  = quantile(target_claims, probs = 0.75),
-          p90_prescribing_rate  = quantile(target_claims, probs = 0.9)
+          total_class_claims = sum(class_claims, na.rm = TRUE),
+          mean_prescribing_rate = round(mean(target_claims), 1)
+          #p10_prescribing_rate  = quantile(target_claims, probs = 0.1),
+          #p25_prescribing_rate  = quantile(target_claims, probs = 0.25),
+          #p75_prescribing_rate  = quantile(target_claims, probs = 0.75),
+          #p90_prescribing_rate  = quantile(target_claims, probs = 0.9)
+        ) %>% 
+        mutate(
+          target_rate = round(100*(total_claims/total_class_claims), 1)
         )
         
     },
@@ -124,16 +109,21 @@ build_changer_data <- R6::R6Class(
       self$tidy_combined_data()
       if(self$create_figure == TRUE) {
         figure_data <- self$tidy_data %>%
-          select(year, paid_group, total_claims) %>% 
-          tidyr::spread(year, total_claims) %>% 
+          select(year, paid_group, mean_prescribing_rate) %>%
+          tidyr::spread(year, mean_prescribing_rate) %>%
           mutate(percent_diff = round(100*(`2014` - `2013`)/`2013`))
+        # figure_data <- self$tidy_data %>%
+        #   select(year, paid_group, target_rate) %>%
+        #   tidyr::spread(year, target_rate) %>%
+        #   mutate(percent_diff = round(100*(`2014` - `2013`)/`2013`))
         percent_increase <- data_frame(
           x_pos = rep(2.13, 4),
           y_pos = 1.001*(figure_data$`2014`),
           increase = str_c(figure_data$percent_diff, '%')
         )
         figure1 <- ggplot2::ggplot(self$tidy_data, 
-                                   aes(x = year, y = total_claims, group = paid_group, colour = paid_group)) +
+                                   aes(x = year, y = mean_prescribing_rate, group = paid_group, 
+                                       colour = paid_group)) +
           geom_line(size = 1.12) +
           geom_point(size = 5.2, shape = 21, fill = "white") + 
           annotate("text",
@@ -149,12 +139,12 @@ build_changer_data <- R6::R6Class(
                                          'Change Year Meal' = '#C70039',
                                          'Both Year Meals' = '#581845')
                               ) +
-          ylab("Denosumab(Prolia \U00AE) Claims, # \n") + 
+          ylab("Denosumab (Prolia \U00AE) Prescribing Rate, # per Physician \n") + 
           labs(color = "Meal Payment Group") + 
           theme(legend.text = element_text(size = 18)) + 
           theme(legend.title = element_text(size = 18)) + 
           theme(legend.key.size = unit(1.5, "cm")) + 
-          scale_y_continuous(limits = c(350, 7500), breaks = seq(350, 7500, 500), expand = c(0,0)) +
+          scale_y_continuous(limits = c(0, 6), breaks = seq(0, 6, 0.5), expand = c(0,0)) +
           theme(axis.text = element_text(face = "bold", size = 17, colour = "black")) +
           theme(panel.background = element_rect(colour = "white", fill = "white")) +
           theme(axis.line = element_line(colour = "black")) +
