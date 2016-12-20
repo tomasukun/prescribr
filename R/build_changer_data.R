@@ -5,7 +5,6 @@
 #' @import tidyr
 #' @import readr
 #' @import purrr
-#' @import lubridate
 #' @import ggplot2
 #' @importFrom Kmisc kLoad
  
