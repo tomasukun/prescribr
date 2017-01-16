@@ -84,15 +84,33 @@ study_pop_library <- R6::R6Class(
                                     'IBANDRONATE SODIUM', 'BONIVA', 'ATELVIA', 'ACTONEL', 
                                     'RISEDRONATE SODIUM', 'ZOLEDRONIC ACID', 'ZOMETA', 'RECLAST',
                                     'PROLIA', 'FORTEO', 'RALOXIFENE HCL', 'EVISTA', sep = '|'),
-      nsaid = stringr::str_c('FLECTOR', 'PENNSAID', 'VOLTAREN', 'DICLOFENAC SODIUM' , sep = '|')
+      nsaid = stringr::str_c("FLECTOR","CATAFLAM","DICLOFENAC POTASSIUM","CAMBIA","ZIPSOR",
+                             "PENNSAID","VOLTAREN","DICLOFENAC SODIUM","DICLOFENAC SODIUM ER",
+                             "VOLTAREN-XR","DICLOFENAC SODIUM-MISOPROSTOL","ARTHROTEC 50",
+                             "ARTHROTEC 75","ZORVOLEX","CATAFLAM","CELECOXIB","CELEBREX",
+                             "DIFLUNISAL","ETODOLAC","ETODOLAC ER","NALFON","FENOPROFEN CALCIUM",
+                             "FLURBIPROFEN","IBUPROFEN","DUEXIS","INDOMETHACIN","INDOCIN",
+                             "KETOPROFEN","KETOROLAC TROMETHAMINE","MECLOFENAMATE SODIUM",
+                             "MEFENAMIC ACID","PONSTEL","MELOXICAM","MOBIC","NABUMETONE",
+                             "EC-NAPROSYN","NAPROSYN","NAPROXEN","NAPROXEN SODIUM","NAPRELAN",
+                             "ANAPROX DS","ANAPROX","VIMOVO","OXAPROZIN","DAYPRO","PIROXICAM",
+                             "FELDENE","SULINDAC","TOLMETIN SODIUM" , sep = '|'),
+      nasal_steroids = stringr::str_c("DYMISTA","QNASL","BECONASE AQ","RHINOCORT AQUA",
+                                      "BUDESONIDE","OMNARIS","ZETONNA","FLUNISOLIDE","VERAMYST",
+                                      "FLONASE","FLUTICASONE PROPIONATE","NASONEX","NASACORT AQ",
+                                      "TRIAMCINOLONE ACETONIDE", sep = '|'),
+      neuropathic_pain = stringr::str_c("GRALISE", "GABAPENTIN", "NEURONTIN","HORIZANT","LYRICA",
+                                        sep = '|')
     ),
-    
+
     open_payments_target = c(
       'crestor' = 'CRESTOR',
       'zyvox' = 'ZYVOX',
       'durezol' = 'DUREZOL',
       'prolia' = 'PROLIA',
-      'flector' = 'FLECTOR'
+      'voltaren' = 'VOLTAREN Gel',
+      'nasonex' = 'NASONEX|NASONEX Respiratory',
+      'lyrica' = 'LYRICA'
      ),
     
     target_drug_manufacturer = c(
@@ -100,7 +118,9 @@ study_pop_library <- R6::R6Class(
       'zyvox' = 'Pfizer',
       'durezol' = 'Alcon',
       'prolia' = 'Amgen Inc.|Medtronic Sofamor Danek USA, Inc.',
-      'flector' = 'Pfizer'
+      'voltaren' = 'Endo Pharmaceuticals Inc.',
+      'nasonex' = 'Merk Sharp & Dohme Corporation|COMSORT, Inc',
+      'lyrica' = 'Pfizer'
     )
   )
 )
