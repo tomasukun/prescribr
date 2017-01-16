@@ -102,6 +102,16 @@ study_pop_library <- R6::R6Class(
       neuropathic_pain = stringr::str_c("GRALISE", "GABAPENTIN", "NEURONTIN","HORIZANT","LYRICA",
                                         sep = '|')
     ),
+    
+    partd_target = c(
+      'crestor' = 'CRESTOR',
+      'zyvox' = 'ZYVOX',
+      'durezol' = 'DUREZOL',
+      'prolia' = 'PROLIA',
+      'voltaren' = 'VOLTAREN',
+      'nasonex' = 'NASONEX',
+      'lyrica' = 'LYRICA'
+    ),
 
     open_payments_target = c(
       'crestor' = 'CRESTOR',
