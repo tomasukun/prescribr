@@ -18,13 +18,17 @@ build_drug_class <- R6::R6Class(
     partd_drug_class = data_frame(),
     open_pay_target = data_frame(),
     drug_class = NULL,
-    target_drug = NULL,
+    partd_target_drug = NULL,
+    openpay_target_drug = NULL,
     target_manufacturer = NULL,
     
     initialize = function(yr = '2014', class = 'statins', target_drug = 'crestor') {
       self$year <- yr
       self$drug_class <- class
-      self$target_drug <- plyr::mapvalues(target_drug,
+      self$partd_target_drug <- plyr::mapvalues(target_drug,
+                                           names(self$partd_target),
+                                           self$partd_target)
+      self$openpay_target_drug <- plyr::mapvalues(target_drug,
                                           names(self$open_payments_target),
                                           self$open_payments_target)
       self$target_manufacturer <- plyr::mapvalues(target_drug,
@@ -62,16 +66,16 @@ build_drug_class <- R6::R6Class(
         group_by(NPI) %>% 
         mutate(
           total_class_bene = sum(doc_drug_class_bene_count),
-          total_target_bene = sum(doc_drug_class_bene_count[doc_drug_class_brand_name == self$target_drug],
+          total_target_bene = sum(doc_drug_class_bene_count[doc_drug_class_brand_name == self$partd_target_drug],
                                   na.rm = TRUE),
           total_class_claims = sum(doc_drug_class_claims),
-          total_target_claims = sum(doc_drug_class_claims[doc_drug_class_brand_name == self$target_drug],
+          total_target_claims = sum(doc_drug_class_claims[doc_drug_class_brand_name == self$partd_target_drug],
                                     na.rm = TRUE),
           total_class_day_supply = sum(doc_drug_class_day_supply),
-          total_target_day_supply = sum(doc_drug_class_day_supply[doc_drug_class_brand_name == self$target_drug],
+          total_target_day_supply = sum(doc_drug_class_day_supply[doc_drug_class_brand_name == self$partd_target_drug],
                                         na.rm = TRUE),
           total_class_drug_cost = sum(doc_drug_class_cost),
-          total_target_drug_cost = sum(doc_drug_class_cost[doc_drug_class_brand_name == self$target_drug],
+          total_target_drug_cost = sum(doc_drug_class_cost[doc_drug_class_brand_name == self$partd_target_drug],
                                        na.rm = TRUE)
         ) %>% 
         select(-doc_drug_class_bene_count, -doc_drug_class_claims, -doc_drug_class_brand_name,
@@ -123,9 +127,9 @@ build_drug_class <- R6::R6Class(
         self$study_group_pop[[paste0(self$drug_class, '_', self$year)]]$meal_payment <- nrow(distinct(study_group_paid, NPI))
         
         # distinct TARGET PAID docs
-        target_drug_regex <- str_c(self$target_drug, tolower(self$target_drug),
-                                    str_replace(tolower(self$target_drug), str_sub(tolower(self$target_drug), 1, 1), 
-                                                toupper(str_sub(self$target_drug, 1, 1))), 
+        target_drug_regex <- str_c(self$openpay_target_drug, tolower(self$openpay_target_drug),
+                                    str_replace(tolower(self$openpay_target_drug), str_sub(tolower(self$openpay_target_drug), 1, 1), 
+                                                toupper(str_sub(self$openpay_target_drug, 1, 1))), 
                                     sep = '|')
         study_group_target_paid <- study_group_paid %>% 
           filter(
