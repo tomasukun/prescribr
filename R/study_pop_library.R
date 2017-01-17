@@ -129,7 +129,7 @@ study_pop_library <- R6::R6Class(
       'durezol' = 'Alcon',
       'prolia' = 'Amgen Inc.|Medtronic Sofamor Danek USA, Inc.',
       'voltaren' = 'Endo Pharmaceuticals Inc.',
-      'nasonex' = 'Merk Sharp & Dohme Corporation|COMSORT, Inc',
+      'nasonex' = 'Merck Sharp & Dohme Corporation|COMSORT, Inc',
       'lyrica' = 'Pfizer'
     ),
     
