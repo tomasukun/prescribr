@@ -131,6 +131,19 @@ study_pop_library <- R6::R6Class(
       'voltaren' = 'Endo Pharmaceuticals Inc.',
       'nasonex' = 'Merk Sharp & Dohme Corporation|COMSORT, Inc',
       'lyrica' = 'Pfizer'
+    ),
+    
+    figure_drug_class_brand = c(
+      'nsaid' = 'Voltaren',
+      'nasal_steroids' = 'Nasonex',
+      'neuropathic_pain' = 'Lyrica'
+    ),
+    
+    figure_drug_class_formulary = c(
+      'nsaid' = 'Diclofenac',
+      'nasal_steroids' = 'Mometasone',
+      'neuropathic_pain' = 'Pregabalin'
     )
+    
   )
 )
