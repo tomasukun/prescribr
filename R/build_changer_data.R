@@ -87,7 +87,7 @@ build_changer_data <- R6::R6Class(
                                       change_year_bene_count)) %>%
         ungroup() %>%
         mutate(
-          target_per_bene = target_claims/(bene_count/100)
+          target_per_bene = target_claims/(bene_count/1000)
         ) %>% 
         group_by(year, paid_group) %>%
         summarise(
@@ -118,54 +118,59 @@ build_changer_data <- R6::R6Class(
       self$merge_source_data()
       self$tidy_combined_data()
       if(self$create_figure == TRUE) {
+        browser()
         figure_data <- self$tidy_data %>%
           select(year, paid_group, mean_target_per_bene) %>%
           tidyr::spread(year, mean_target_per_bene) %>%
-          mutate(percent_diff = round(100*(`2014` - `2013`)/`2013`))
+          mutate(
+            change = `2014` - `2013`,
+            percent_diff = round(100*(`2014` - `2013`)/`2013`)
+          )
+        figure_data$paid_group <- factor(figure_data$paid_group, 
+                                         levels = c('No Meals', 'Base Year Meal', 
+                                                    'Change Year Meal', 'Both Year Meals'))
+        # figure meta data
+        target_formulary_name = plyr::mapvalues(self$drug_class,
+                                         names(self$figure_drug_class_formulary),
+                                         self$figure_drug_class_formulary)
+        target_brand_name = plyr::mapvalues(self$drug_class,
+                                      names(self$figure_drug_class_brand),
+                                      self$figure_drug_class_brand)
+        
         # figure_data <- self$tidy_data %>%
         #   select(year, paid_group, target_rate) %>%
         #   tidyr::spread(year, target_rate) %>%
         #   mutate(percent_diff = round(100*(`2014` - `2013`)/`2013`))
-        percent_increase <- data_frame(
-          x_pos = rep(2.13, 4),
-          y_pos = 1.001*(figure_data$`2014`),
-          increase = str_c(figure_data$percent_diff, '%')
-        )
-        figure1 <- ggplot2::ggplot(self$tidy_data, 
-                                   aes(x = year, y = mean_target_per_bene, group = paid_group, 
-                                       colour = paid_group)) +
-          geom_line(size = 1.12) +
-          geom_point(size = 5.2, shape = 21, fill = "white") + 
-          annotate("text",
-                   label = percent_increase$increase,
-                   x = percent_increase$x_pos,
-                   y = percent_increase$y_pos,
-                   size = 7) +
-          scale_colour_manual(
-                              breaks = c('No Meals', 'Base Year Meal',
-                                         'Change Year Meal', 'Both Year Meals'),
-                              values = c('No Meals' = '#FFC300',
-                                         'Base Year Meal' = '#FF5733',
-                                         'Change Year Meal' = '#C70039',
-                                         'Both Year Meals' = '#581845')
-                              ) +
-          ylab("Difluprednate (Durezol \U00AE) Prescribing Rate per Beneficiary, # per 100 Beneficiaries \n") + 
-          labs(color = "Meal Payment Group") + 
-          theme(legend.text = element_text(size = 18)) + 
-          theme(legend.title = element_text(size = 18)) + 
-          theme(legend.key.size = unit(1.5, "cm")) + 
-          scale_y_continuous(limits = c(4, 22), breaks = seq(4, 22, 2), expand = c(0,0)) +
+        # percent_increase <- data_frame(
+        #   x_pos = rep(2.13, 4),
+        #   y_pos = 1.001*(figure_data$`2014`),
+        #   increase = str_c(figure_data$percent_diff, '%')
+        # )
+        figure1 <- ggplot2::ggplot(figure_data, 
+                                   aes(x = paid_group, y = change)) +
+          geom_bar(width = 0.25, fill = 'grey80', stat = 'identity') + 
+          geom_hline(yintercept = 0, col = "black", lwd = 0.1) +
+          geom_hline(yintercept = c(seq(-8,-1), seq(1,8)), col = "white", lwd = 0.6) +
+          # annotate("text",
+          #          label = percent_increase$increase,
+          #          x = percent_increase$x_pos,
+          #          y = percent_increase$y_pos,
+          #          size = 7) +
+          ylab(sprintf("Change in %s (%s \U00AE) Prescribing Rate per 1000 Beneficiaries \n", 
+                       target_formulary_name, target_brand_name)) + 
+          xlab("") +
+          scale_y_continuous(limits = c(-8, 8), breaks = seq(-8, 8, 1), expand = c(0,0)) +
+          scale_x_discrete(labels = c('None', '2013 Only', '2014 Only', 'Both Years')) +
           theme(axis.text = element_text(face = "bold", size = 17, colour = "black")) +
           theme(panel.background = element_rect(colour = "white", fill = "white")) +
           theme(axis.line = element_line(colour = "black")) +
           theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), 
                 panel.grid.minor.y = element_blank()) +
-          theme(panel.grid.major.y = element_line(colour = "grey90")) +
+          theme(panel.grid.major.y = element_line(colour = "white")) +
           theme(axis.ticks = element_line(colour = "black")) + 
           theme(axis.title = element_text(hjust = 0.5)) +
-          ggtitle("Durezol") +
+          ggtitle(sprintf("%s", target_brand_name)) +
           theme(title = element_text( size = 18, color = "black", hjust = 0.5, face = "bold"))
-        browser()
         # jpeg(filename = paste0(self$shared_docs_dir, 'figure1_changer_analysis_', self$drug_class, '.jpeg'), 
         #      width = 1250, height = 1150, quality = 100, units = "px", pointsize = 12)
       }
