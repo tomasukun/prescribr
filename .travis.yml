@@ -1,14 +1,20 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+language: c
 
-language: r
-sudo: false
-cache: packages
-warnings_are_errors: false
 before_install:
-  - Rscript -e 'install.packages("dplyr", lib="/home/travis/R-bin/lib/R/library/")'
-  - Rscript -e 'install.packages("lubridate", lib="/home/travis/R-bin/lib/R/library/")'
+  - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
+  - chmod 755 ./travis-tool.sh
+  - ./travis-tool.sh bootstrap
 install:
-  - Rscript -e "0" --args --bootstrap-packrat
-cache:
-  directories: $TRAVIS_BUILD_DIR/packrat/
-  packages: true
+  - ./travis-tool.sh install_deps
+script: ./travis-tool.sh run_tests
+
+after_failure:
+  - ./travis-tool.sh dump_logs
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
+  
+  
