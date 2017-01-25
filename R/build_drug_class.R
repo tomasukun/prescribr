@@ -5,7 +5,6 @@
 #' @import tidyr
 #' @import readr
 #' @import purrr
-#' @import lubridate
 #' @importFrom Kmisc kLoad
 
 build_drug_class <- R6::R6Class(
