@@ -96,15 +96,10 @@ build_changer_data <- R6::R6Class(
           total_class_claims = sum(class_claims, na.rm = TRUE),
           mean_prescribing_rate = round(mean(target_claims), 1),
           mean_target_per_bene = round(mean(target_per_bene), 1)
-          #p10_prescribing_rate  = quantile(target_claims, probs = 0.1),
-          #p25_prescribing_rate  = quantile(target_claims, probs = 0.25),
-          #p75_prescribing_rate  = quantile(target_claims, probs = 0.75),
-          #p90_prescribing_rate  = quantile(target_claims, probs = 0.9)
         ) %>% 
         mutate(
           target_rate = round(100*(total_claims/total_class_claims), 1)
         )
-        
     },
     
     save_tables = function() {
@@ -119,9 +114,17 @@ build_changer_data <- R6::R6Class(
       self$tidy_combined_data()
       if(self$create_figure == TRUE) {
         browser()
+        # figure_data <- self$tidy_data %>%
+        #   select(year, paid_group, mean_target_per_bene) %>%
+        #   tidyr::spread(year, mean_target_per_bene) %>%
+        #   mutate(
+        #     change = `2014` - `2013`,
+        #     percent_diff = round(100*(`2014` - `2013`)/`2013`)
+        #   )
         figure_data <- self$tidy_data %>%
-          select(year, paid_group, mean_target_per_bene) %>%
-          tidyr::spread(year, mean_target_per_bene) %>%
+          select(year, paid_group, mean_prescribing_rate) 
+        annotation_data <- figure_data %>% 
+          tidyr::spread(year, mean_prescribing_rate) %>%
           mutate(
             change = `2014` - `2013`,
             percent_diff = round(100*(`2014` - `2013`)/`2013`)
@@ -137,15 +140,27 @@ build_changer_data <- R6::R6Class(
                                       names(self$figure_drug_class_brand),
                                       self$figure_drug_class_brand)
         
-        # figure_data <- self$tidy_data %>%
-        #   select(year, paid_group, target_rate) %>%
-        #   tidyr::spread(year, target_rate) %>%
-        #   mutate(percent_diff = round(100*(`2014` - `2013`)/`2013`))
-        # percent_increase <- data_frame(
-        #   x_pos = rep(2.13, 4),
-        #   y_pos = 1.001*(figure_data$`2014`),
-        #   increase = str_c(figure_data$percent_diff, '%')
-        # )
+        # figure1 <- ggplot2::ggplot(figure_data, 
+        #                            aes(x = paid_group, y = change)) +
+        #   geom_bar(width = 0.25, fill = 'grey80', stat = 'identity') + 
+        #   geom_hline(yintercept = 0, col = "black", lwd = 0.1) +
+        #   geom_hline(yintercept = c(seq(-8,-1), seq(1,8)), col = "white", lwd = 0.6) +
+        #   ylab(sprintf("Change in %s (%s \U00AE) Prescribing Rate per 1000 Beneficiaries \n", 
+        #                target_formulary_name, target_brand_name)) + 
+        #   xlab("") +
+        #   scale_y_continuous(limits = c(-8, 8), breaks = seq(-8, 8, 1), expand = c(0,0)) +
+        #   scale_x_discrete(labels = c('None', '2013 Only', '2014 Only', 'Both Years')) +
+        #   theme(axis.text = element_text(face = "bold", size = 17, colour = "black")) +
+        #   theme(panel.background = element_rect(colour = "white", fill = "white")) +
+        #   theme(axis.line = element_line(colour = "black")) +
+        #   theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), 
+        #         panel.grid.minor.y = element_blank()) +
+        #   theme(panel.grid.major.y = element_line(colour = "white")) +
+        #   theme(axis.ticks = element_line(colour = "black")) + 
+        #   theme(axis.title = element_text(hjust = 0.5)) +
+        #   ggtitle(sprintf("%s", target_brand_name)) +
+        #   theme(title = element_text( size = 18, color = "black", hjust = 0.5, face = "bold"))
+        
         figure1 <- ggplot2::ggplot(figure_data, 
                                    aes(x = paid_group, y = change)) +
           geom_bar(width = 0.25, fill = 'grey80', stat = 'identity') + 
