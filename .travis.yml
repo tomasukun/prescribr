@@ -1,6 +1,6 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
-language: r
+language: R
 sudo: false
 cache: packages
 warnings_are_errors: false
@@ -9,6 +9,6 @@ before_install:
   - Rscript -e 'install.packages("lubridate", lib="/home/travis/R-bin/lib/R/library/")'
 install:
   - Rscript -e "0" --args --bootstrap-packrat
-cache:
-  directories: $TRAVIS_BUILD_DIR/packrat/
-  packages: true
+#cache:
+#  directories: $TRAVIS_BUILD_DIR/packrat/
+#  packages: true
