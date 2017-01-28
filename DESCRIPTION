@@ -16,8 +16,7 @@ Imports:
     purrr,
     Kmisc,
     plyr,
-    ggplot2,
-    readr
+    ggplot2
 Suggests:
     lubridate
 RoxygenNote: 5.0.1
