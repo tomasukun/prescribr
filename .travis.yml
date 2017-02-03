@@ -1,14 +1,20 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
-language: r
+language: R
 sudo: false
 cache: packages
 warnings_are_errors: false
 before_install:
   - Rscript -e 'install.packages("dplyr", lib="/home/travis/R-bin/lib/R/library/")'
-  - Rscript -e 'install.packages("lubridate", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("purrr", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("readr", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("stringr", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("tidyr", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("ggplot2", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("Kmisc", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("plyr", lib="/home/travis/R-bin/lib/R/library/")'
 install:
   - Rscript -e "0" --args --bootstrap-packrat
-cache:
-  directories: $TRAVIS_BUILD_DIR/packrat/
-  packages: true
+#cache:
+#  directories: $TRAVIS_BUILD_DIR/packrat/
+#  packages: true

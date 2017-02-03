@@ -4,7 +4,6 @@
 #' @import tidyr
 #' @import readr
 #' @import purrr
-#' @importFrom lubridate mdy ymd
 #' @importFrom Kmisc kLoad
 
 build_openpay_year <- R6::R6Class(
