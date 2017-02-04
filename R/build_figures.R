@@ -1,0 +1,115 @@
+#' Builder class for figures
+#' @import dplyr
+#' @importFrom plyr mapvalues
+#' @import stringr
+#' @import tidyr
+#' @import readr
+#' @import ggplot2
+
+build_figures <- R6::R6Class(
+  'build_figures',
+  inherit = build_changer_data,
+  public = list(
+    type = '',
+    figure_data = data_frame(),
+    drug_class = '',
+    target_formulary_name = '',
+    target_brand_name = '',
+    
+    initialize = function(data, class, type = NULL) {
+      self$figure_data <- data
+      self$type <- type
+      self$drug_class <- class
+    },
+    
+    build_figure_data = function(data = NULL, type = self$type) {
+      # figure meta data
+      self$target_formulary_name = plyr::mapvalues(self$drug_class,
+                                              names(self$figure_drug_class_formulary),
+                                              self$figure_drug_class_formulary)
+      self$target_brand_name = plyr::mapvalues(self$drug_class,
+                                          names(self$figure_drug_class_brand),
+                                          self$figure_drug_class_brand)
+      if(self$type == 'script-rate') {
+        self$figure_data <- self$figure_data %>%
+          select(year, paid_group, mean_prescribing_rate) 
+        self$figure_data$paid_group <- factor(self$figure_data$paid_group, 
+                                              levels = c('No Meals', 'Base Year Meal', 
+                                                         'Change Year Meal', 'Both Year Meals'))
+      } else if(self$type == 'per-bene') {
+        self$figure_data <- self$figure_data %>%
+          select(year, paid_group, mean_target_per_bene) %>%
+          tidyr::spread(year, mean_target_per_bene) %>%
+          mutate(
+            change = `2014` - `2013`,
+            percent_diff = round(100*(`2014` - `2013`)/`2013`)
+          )
+        self$figure_data$paid_group <- factor(self$figure_data$paid_group, 
+                                              levels = c('No Meals', 'Base Year Meal', 
+                                                         'Change Year Meal', 'Both Year Meals'))
+      } else{
+        cat(sprintf('%s is not a supported figure type \n\n figure data not created', self$type))
+      }
+      
+    },
+    
+    build_figure = function() {
+      if(self$type == 'script-rate') {
+        figure <- ggplot2::ggplot(self$figure_data, 
+                                   aes(x = paid_group, y = mean_prescribing_rate,
+                                       colour = year)) +
+          geom_line(aes(group = year), linetype = 2, size = 1.5) + 
+          geom_point(size = 1) + 
+          geom_hline(yintercept = 0, col = "black", lwd = 0.1) +
+          ylab(sprintf("%s (%s \U00AE) Prescribing Rate \n", 
+                       self$target_formulary_name, self$target_brand_name)) + 
+          xlab("") +
+          scale_y_continuous(limits = c(0, ceiling(max(self$figure_data$mean_prescribing_rate))),
+                                        breaks = seq(0, ceiling(max(self$figure_data$mean_prescribing_rate)), 2), 
+                                        expand = c(0,0)) +
+          scale_x_discrete(labels = c('None', '2013 Only', '2014 Only', 'Both Years')) +
+          theme(axis.text = element_text(face = "bold", size = 17, colour = "black")) +
+          theme(panel.background = element_rect(colour = "white", fill = "white")) +
+          theme(axis.line = element_line(colour = "black")) +
+          theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), 
+                panel.grid.minor.y = element_blank()) +
+          theme(panel.grid.major.y = element_line(colour = "white")) +
+          theme(axis.ticks = element_line(colour = "black")) + 
+          theme(axis.title = element_text(hjust = 0.5)) +
+          theme(legend.key.size = unit(2, "cm"),
+                legend.text = element_text(size = 12)) + 
+          ggtitle(sprintf("%s", self$target_brand_name)) +
+          theme(title = element_text( size = 18, color = "black", hjust = 0.5, face = "bold"))
+      } else if(self$type == 'per-bene') {
+        figure <- ggplot2::ggplot(self$figure_data,
+                                   aes(x = paid_group, y = change)) +
+          geom_bar(width = 0.25, fill = 'grey80', stat = 'identity') +
+          geom_hline(yintercept = 0, col = "black", lwd = 0.1) +
+          geom_hline(yintercept = c(seq(-8,-1), seq(1,8)), col = "white", lwd = 0.6) +
+          ylab(sprintf("Change in %s (%s \U00AE) Prescribing Rate per 1000 Beneficiaries \n",
+                       self$target_formulary_name, self$target_brand_name)) +
+          xlab("") +
+          scale_y_continuous(limits = c(-8, 8), breaks = seq(-8, 8, 1), expand = c(0,0)) +
+          scale_x_discrete(labels = c('None', '2013 Only', '2014 Only', 'Both Years')) +
+          theme(axis.text = element_text(face = "bold", size = 17, colour = "black")) +
+          theme(panel.background = element_rect(colour = "white", fill = "white")) +
+          theme(axis.line = element_line(colour = "black")) +
+          theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(),
+                panel.grid.minor.y = element_blank()) +
+          theme(panel.grid.major.y = element_line(colour = "white")) +
+          theme(axis.ticks = element_line(colour = "black")) +
+          theme(axis.title = element_text(hjust = 0.5)) +
+          ggtitle(sprintf("%s", self$target_brand_name)) +
+          theme(title = element_text( size = 18, color = "black", hjust = 0.5, face = "bold"))
+      } else {
+        stop('specify correct figure type')
+      }
+      browser()
+      jpeg(filename = paste0(self$shared_docs_dir, 'figure_changer_analysis_', 
+                             self$drug_class, '_', self$type, '.jpeg'),
+           width = 1250, height = 1150, quality = 100, units = "px", pointsize = 12)
+      figure
+      dev.off()
+    }
+  )
+)

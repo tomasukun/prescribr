@@ -16,18 +16,18 @@ build_changer_data <- R6::R6Class(
     base_year = NULL,
     change_year = NULL,
     drug_class = NULL,
-    create_figure = NULL,
+    figure_type = '',
     base_data = data_frame(),
     change_data = data_frame(),
     combined_data = data_frame(),
     tidy_data = data_frame(),
     
     initialize = function(base_year = '2013', change_year = '2014', drug_class = 'statins',
-                          create_figure = FALSE) {
+                          figure_type = '') {
       self$base_year <- base_year
       self$change_year <- change_year
       self$drug_class <- drug_class
-      self$create_figure = create_figure
+      self$figure_type <- figure_type
     },
     
     read_base_year_source = function(year = self$base_year) {
@@ -111,82 +111,12 @@ build_changer_data <- R6::R6Class(
       self$read_change_year_source()
       self$merge_source_data()
       self$tidy_combined_data()
-      if(self$create_figure == TRUE) {
-        browser()
-        # figure_data <- self$tidy_data %>%
-        #   select(year, paid_group, mean_target_per_bene) %>%
-        #   tidyr::spread(year, mean_target_per_bene) %>%
-        #   mutate(
-        #     change = `2014` - `2013`,
-        #     percent_diff = round(100*(`2014` - `2013`)/`2013`)
-        #   )
-        figure_data <- self$tidy_data %>%
-          select(year, paid_group, mean_prescribing_rate) 
-        annotation_data <- figure_data %>% 
-          tidyr::spread(year, mean_prescribing_rate) %>%
-          mutate(
-            change = `2014` - `2013`,
-            percent_diff = round(100*(`2014` - `2013`)/`2013`)
-          )
-        figure_data$paid_group <- factor(figure_data$paid_group, 
-                                         levels = c('No Meals', 'Base Year Meal', 
-                                                    'Change Year Meal', 'Both Year Meals'))
-        # figure meta data
-        target_formulary_name = plyr::mapvalues(self$drug_class,
-                                         names(self$figure_drug_class_formulary),
-                                         self$figure_drug_class_formulary)
-        target_brand_name = plyr::mapvalues(self$drug_class,
-                                      names(self$figure_drug_class_brand),
-                                      self$figure_drug_class_brand)
-        
-        # figure1 <- ggplot2::ggplot(figure_data, 
-        #                            aes(x = paid_group, y = change)) +
-        #   geom_bar(width = 0.25, fill = 'grey80', stat = 'identity') + 
-        #   geom_hline(yintercept = 0, col = "black", lwd = 0.1) +
-        #   geom_hline(yintercept = c(seq(-8,-1), seq(1,8)), col = "white", lwd = 0.6) +
-        #   ylab(sprintf("Change in %s (%s \U00AE) Prescribing Rate per 1000 Beneficiaries \n", 
-        #                target_formulary_name, target_brand_name)) + 
-        #   xlab("") +
-        #   scale_y_continuous(limits = c(-8, 8), breaks = seq(-8, 8, 1), expand = c(0,0)) +
-        #   scale_x_discrete(labels = c('None', '2013 Only', '2014 Only', 'Both Years')) +
-        #   theme(axis.text = element_text(face = "bold", size = 17, colour = "black")) +
-        #   theme(panel.background = element_rect(colour = "white", fill = "white")) +
-        #   theme(axis.line = element_line(colour = "black")) +
-        #   theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), 
-        #         panel.grid.minor.y = element_blank()) +
-        #   theme(panel.grid.major.y = element_line(colour = "white")) +
-        #   theme(axis.ticks = element_line(colour = "black")) + 
-        #   theme(axis.title = element_text(hjust = 0.5)) +
-        #   ggtitle(sprintf("%s", target_brand_name)) +
-        #   theme(title = element_text( size = 18, color = "black", hjust = 0.5, face = "bold"))
-        
-        figure1 <- ggplot2::ggplot(figure_data, 
-                                   aes(x = paid_group, y = change)) +
-          geom_bar(width = 0.25, fill = 'grey80', stat = 'identity') + 
-          geom_hline(yintercept = 0, col = "black", lwd = 0.1) +
-          geom_hline(yintercept = c(seq(-8,-1), seq(1,8)), col = "white", lwd = 0.6) +
-          # annotate("text",
-          #          label = percent_increase$increase,
-          #          x = percent_increase$x_pos,
-          #          y = percent_increase$y_pos,
-          #          size = 7) +
-          ylab(sprintf("Change in %s (%s \U00AE) Prescribing Rate per 1000 Beneficiaries \n", 
-                       target_formulary_name, target_brand_name)) + 
-          xlab("") +
-          scale_y_continuous(limits = c(-8, 8), breaks = seq(-8, 8, 1), expand = c(0,0)) +
-          scale_x_discrete(labels = c('None', '2013 Only', '2014 Only', 'Both Years')) +
-          theme(axis.text = element_text(face = "bold", size = 17, colour = "black")) +
-          theme(panel.background = element_rect(colour = "white", fill = "white")) +
-          theme(axis.line = element_line(colour = "black")) +
-          theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), 
-                panel.grid.minor.y = element_blank()) +
-          theme(panel.grid.major.y = element_line(colour = "white")) +
-          theme(axis.ticks = element_line(colour = "black")) + 
-          theme(axis.title = element_text(hjust = 0.5)) +
-          ggtitle(sprintf("%s", target_brand_name)) +
-          theme(title = element_text( size = 18, color = "black", hjust = 0.5, face = "bold"))
-        # jpeg(filename = paste0(self$shared_docs_dir, 'figure1_changer_analysis_', self$drug_class, '.jpeg'), 
-        #      width = 1250, height = 1150, quality = 100, units = "px", pointsize = 12)
+      if(!(self$figure_type %in% '')) {
+        figure <- build_figures$new(data = self$tidy_data, 
+                                    class = self$drug_class, 
+                                    type = self$figure_type)
+        figure$build_figure_data()
+        figure$build_figure()
       }
       self$save_tables()
     }
