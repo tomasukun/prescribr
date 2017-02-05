@@ -60,45 +60,59 @@ build_changer_data <- R6::R6Class(
         arrange(NPI)
     },
     
-    tidy_combined_data = function() {
+    tidy_combined_data = function(type = self$figure_type) {
       
       self$tidy_data <- self$combined_data %>% 
         mutate(
           paid_group = ifelse(is.na(base_year_payments) & is.na(change_year_payments), 'No Meals',
-                                   ifelse(!is.na(base_year_payments) & is.na(change_year_payments), 'Base Year Meal',
-                                          ifelse(is.na(base_year_payments) & !is.na(change_year_payments), 'Change Year Meal',
-                                                 'Both Year Meals')))
+                              ifelse(!is.na(base_year_payments) & is.na(change_year_payments), 'Base Year Meal',
+                                     ifelse(is.na(base_year_payments) & !is.na(change_year_payments), 'Change Year Meal',
+                                            'Both Year Meals')))
         ) %>% 
-        select(-base_year_payments, -change_year_payments) %>% 
         tidyr::gather(key = 'year_vars', value = 'year', base_year, change_year,
                       -base_year_class_claims, -base_year_target_claims,
                       -change_year_class_claims, -change_year_target_claims, 
-                      -base_year_bene_count, -change_year_bene_count) %>%
+                      -base_year_bene_count, -change_year_bene_count, 
+                      -base_year_payments, -change_year_payments) %>%
         group_by(NPI, year, paid_group) %>%
         summarise(target_claims = ifelse(year == self$base_year,
-                                        base_year_target_claims,
-                                        change_year_target_claims),
+                                         base_year_target_claims, change_year_target_claims),
                   class_claims = ifelse(year == self$base_year,
-                                        base_year_class_claims,
-                                        change_year_class_claims),
+                                        base_year_class_claims, change_year_class_claims),
                   bene_count = ifelse(year == self$base_year,
-                                      base_year_bene_count,
-                                      change_year_bene_count)) %>%
+                                      base_year_bene_count, change_year_bene_count),
+                  payment_count = ifelse(year == self$base_year,
+                                         base_year_payments, change_year_payments)) %>%
         ungroup() %>%
         mutate(
-          target_per_bene = target_claims/(bene_count/1000)
-        ) %>% 
-        group_by(year, paid_group) %>%
-        summarise(
-          group_count = n(),
-          total_claims = sum(target_claims, na.rm = TRUE),
-          total_class_claims = sum(class_claims, na.rm = TRUE),
-          mean_prescribing_rate = round(mean(target_claims), 1),
-          mean_target_per_bene = round(mean(target_per_bene), 1)
-        ) %>% 
-        mutate(
-          target_rate = round(100*(total_claims/total_class_claims), 1)
-        )
+          target_per_bene = target_claims/(bene_count/1000),
+          payment_count = ifelse(payment_count %in% NA, 0, payment_count)
+        ) 
+      
+      if (type != 'scatter') {
+        self$tidy_data <- self$tidy_data %>% 
+          group_by(year, paid_group) %>%
+          summarise(
+            group_count = n(),
+            total_claims = sum(target_claims, na.rm = TRUE),
+            total_class_claims = sum(class_claims, na.rm = TRUE),
+            mean_prescribing_rate = round(mean(target_claims), 1),
+            mean_target_per_bene = round(mean(target_per_bene), 1)
+          )
+      } else {
+        self$tidy_data <- self$tidy_data %>% 
+          arrange(NPI, year) %>% 
+          group_by(NPI, paid_group) %>% 
+          summarise(
+            delta_target_claims = diff(target_claims),
+            delta_class_claims = diff(class_claims),
+            delta_bene_count = diff(bene_count),
+            delta_payment_count = diff(payment_count),
+            delta_target_per_bene = diff(target_per_bene)
+          )
+          
+      }
+      
     },
     
     save_tables = function() {

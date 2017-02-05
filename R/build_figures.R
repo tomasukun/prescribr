@@ -47,6 +47,8 @@ build_figures <- R6::R6Class(
         self$figure_data$paid_group <- factor(self$figure_data$paid_group, 
                                               levels = c('No Meals', 'Base Year Meal', 
                                                          'Change Year Meal', 'Both Year Meals'))
+      } else if(self$type == 'scatter') {
+        self$figure_data <- self$figure_data
       } else{
         cat(sprintf('%s is not a supported figure type \n\n figure data not created', self$type))
       }
@@ -99,6 +101,31 @@ build_figures <- R6::R6Class(
           theme(panel.grid.major.y = element_line(colour = "white")) +
           theme(axis.ticks = element_line(colour = "black")) +
           theme(axis.title = element_text(hjust = 0.5)) +
+          ggtitle(sprintf("%s", self$target_brand_name)) +
+          theme(title = element_text( size = 18, color = "black", hjust = 0.5, face = "bold"))
+      } else if(self$type == 'scatter') {
+        figure <- ggplot2::ggplot(foo$tidy_data) + 
+          ggplot2::geom_jitter(ggplot2::aes(x = delta_payment_count, 
+                                            y = delta_target_per_bene,
+                                            colour = paid_group),
+                               size = 1.5, alpha = 0.99, width = 0.6, height = 0.5) + 
+          scale_colour_brewer(palette = 'Spectral') + 
+          geom_hline(yintercept = 0, col = "black", lwd = 0.1) + 
+          ylab(sprintf("Difference in %s (%s \U00AE) Prescribing Rate per 1000 Beneficiaries \n",
+                       self$target_formulary_name, self$target_brand_name)) +
+          xlab("\nDifference in Payments Recieved") +
+          scale_y_continuous(limits = c(-400, 700), breaks = seq(-400, 700, 100), expand = c(0,0)) +
+          scale_x_continuous(limits = c(-8, 15), breaks = seq(-10, 15, 5), expand = c(0,0)) +
+          theme(axis.text = element_text(face = "bold", size = 17, colour = "black")) +
+          theme(panel.background = element_rect(colour = "white", fill = "white")) +
+          theme(axis.line = element_line(colour = "black")) +
+          theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(),
+                panel.grid.minor.y = element_blank()) +
+          theme(panel.grid.major.y = element_line(colour = "white")) +
+          theme(axis.ticks = element_line(colour = "black")) +
+          theme(axis.title = element_text(hjust = 0.5)) +
+          theme(legend.key.size = unit(2, "cm"),
+                legend.text = element_text(size = 12)) +
           ggtitle(sprintf("%s", self$target_brand_name)) +
           theme(title = element_text( size = 18, color = "black", hjust = 0.5, face = "bold"))
       } else {
