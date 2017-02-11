@@ -110,7 +110,6 @@ build_changer_data <- R6::R6Class(
             delta_payment_count = diff(payment_count),
             delta_target_per_bene = diff(target_per_bene)
           )
-          
       }
       
     },
