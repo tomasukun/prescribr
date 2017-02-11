@@ -30,12 +30,12 @@ build_figures <- R6::R6Class(
       self$target_brand_name = plyr::mapvalues(self$drug_class,
                                           names(self$figure_drug_class_brand),
                                           self$figure_drug_class_brand)
+      self$figure_data$paid_group <- factor(self$figure_data$paid_group, 
+                                            levels = c('No Meals', 'Base Year Meal', 
+                                                       'Change Year Meal', 'Both Year Meals'))
       if(self$type == 'script-rate') {
         self$figure_data <- self$figure_data %>%
           select(year, paid_group, mean_prescribing_rate) 
-        self$figure_data$paid_group <- factor(self$figure_data$paid_group, 
-                                              levels = c('No Meals', 'Base Year Meal', 
-                                                         'Change Year Meal', 'Both Year Meals'))
       } else if(self$type == 'per-bene') {
         self$figure_data <- self$figure_data %>%
           select(year, paid_group, mean_target_per_bene) %>%
@@ -44,10 +44,7 @@ build_figures <- R6::R6Class(
             change = `2014` - `2013`,
             percent_diff = round(100*(`2014` - `2013`)/`2013`)
           )
-        self$figure_data$paid_group <- factor(self$figure_data$paid_group, 
-                                              levels = c('No Meals', 'Base Year Meal', 
-                                                         'Change Year Meal', 'Both Year Meals'))
-      } else if(self$type == 'scatter') {
+      } else if(self$type %in% c('scatter', 'slopes')) {
         self$figure_data <- self$figure_data
       } else{
         cat(sprintf('%s is not a supported figure type \n\n figure data not created', self$type))
@@ -104,7 +101,7 @@ build_figures <- R6::R6Class(
           ggtitle(sprintf("%s", self$target_brand_name)) +
           theme(title = element_text( size = 18, color = "black", hjust = 0.5, face = "bold"))
       } else if(self$type == 'scatter') {
-        figure <- ggplot2::ggplot(foo$tidy_data) + 
+        figure <- ggplot2::ggplot(self$figure_data) + 
           ggplot2::geom_jitter(ggplot2::aes(x = delta_payment_count, 
                                             y = delta_target_per_bene,
                                             colour = paid_group),
@@ -116,6 +113,36 @@ build_figures <- R6::R6Class(
           xlab("\nDifference in Payments Recieved") +
           scale_y_continuous(limits = c(-400, 700), breaks = seq(-400, 700, 100), expand = c(0,0)) +
           scale_x_continuous(limits = c(-8, 15), breaks = seq(-10, 15, 5), expand = c(0,0)) +
+          theme(axis.text = element_text(face = "bold", size = 17, colour = "black")) +
+          theme(panel.background = element_rect(colour = "white", fill = "white")) +
+          theme(axis.line = element_line(colour = "black")) +
+          theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(),
+                panel.grid.minor.y = element_blank()) +
+          theme(panel.grid.major.y = element_line(colour = "white")) +
+          theme(axis.ticks = element_line(colour = "black")) +
+          theme(axis.title = element_text(hjust = 0.5)) +
+          theme(legend.key.size = unit(2, "cm"),
+                legend.text = element_text(size = 12)) +
+          ggtitle(sprintf("%s", self$target_brand_name)) +
+          theme(title = element_text( size = 18, color = "black", hjust = 0.5, face = "bold"))
+      } else if(self$type == 'slopes') {
+        annotate_text <- self$figure_data %>%
+          select(year, paid_group, mean_target_per_bene) %>%
+          tidyr::spread(year, mean_target_per_bene) %>%
+          mutate(
+            change = `2014` - `2013`,
+            percent_diff = round(100*(`2014` - `2013`)/`2013`, 1))
+        figure <- ggplot2::ggplot(self$figure_data, 
+                                  aes(x = year, y = mean_target_per_bene, colour = paid_group)) + 
+          geom_line(aes(group = paid_group), linetype = 1, size = 1.5) +  
+          geom_point(size = 3, fill = 'white') +
+          annotate("text", x = 2.15, y = annotate_text$`2014`, 
+                   label = str_c(annotate_text$percent_diff, '%'), size = 12) +
+          scale_colour_brewer(palette = 'Spectral') +
+          ylab(sprintf("%s (%s \U00AE) Prescribing Rate per 1000 Beneficiaries \n",
+                       self$target_formulary_name, self$target_brand_name)) +
+          xlab("") +
+          scale_y_continuous(limits = c(0, 175), breaks = seq(0, 175, 25), expand = c(0,0)) +
           theme(axis.text = element_text(face = "bold", size = 17, colour = "black")) +
           theme(panel.background = element_rect(colour = "white", fill = "white")) +
           theme(axis.line = element_line(colour = "black")) +
