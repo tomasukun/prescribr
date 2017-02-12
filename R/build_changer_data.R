@@ -40,7 +40,9 @@ build_changer_data <- R6::R6Class(
                base_year_target_claims = total_target_claims, 
                base_year_payments = total_target_payment_number,
                base_year_bene_count = doc_bene_count,
-               base_year = self$base_year)
+               base_year = self$base_year) %>% 
+        select(NPI, doc_specialty, doc_state, doc_gender, doc_mapd_claims, doc_lis_claims, 
+               doc_group_size, contains('base_year'))
     },
     
     read_change_year_source = function() {
@@ -50,15 +52,13 @@ build_changer_data <- R6::R6Class(
                change_year_target_claims = total_target_claims, 
                change_year_payments = total_target_payment_number,
                change_year_bene_count = doc_bene_count, 
-               change_year = self$change_year)
+               change_year = self$change_year) %>% 
+        select(NPI, contains('change_year'))
     },
     
     merge_source_data = function() {
       self$combined_data <- self$base_data %>% 
-        inner_join(self$change_data, by = 'NPI') %>% 
-        select(NPI, doc_specialty, doc_state, doc_bene_count, doc_total_claims,
-               doc_mapd_claims, doc_lis_claims, total_target_claims, total_class_claims,
-               total_target_payment_number, contains('base_year'), contains('change_year')) %>% 
+        inner_join(self$change_data, by = 'NPI') %>%
         arrange(NPI)
     },
     
