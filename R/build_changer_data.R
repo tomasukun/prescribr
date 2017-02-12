@@ -17,52 +17,56 @@ build_changer_data <- R6::R6Class(
     change_year = NULL,
     drug_class = NULL,
     figure_type = '',
+    analysis_type = '',
     base_data = data_frame(),
     change_data = data_frame(),
     combined_data = data_frame(),
-    tidy_data = data_frame(),
+    figure_data = data_frame(),
+    analysis_data = data_frame(),
     
     initialize = function(base_year = '2013', change_year = '2014', drug_class = 'statins',
-                          figure_type = '') {
+                          figure_type = '', analysis_type = '') {
       self$base_year <- base_year
       self$change_year <- change_year
       self$drug_class <- drug_class
       self$figure_type <- figure_type
+      self$analysis_type <- analysis_type
     },
     
-    read_base_year_source = function(year = self$base_year) {
+    read_base_year_source = function() {
       self$base_data <- Kmisc::kLoad(paste0('data/source_tables/study_group_', self$drug_class,
-                                            '_', year, '.rData')) %>% 
-        select(NPI, 
-               base_year_class_claims = total_class_claims,
+                                            '_', self$base_year, '.rData')) %>% 
+        mutate(base_year_class_claims = total_class_claims,
                base_year_target_claims = total_target_claims, 
                base_year_payments = total_target_payment_number,
-               base_year_bene_count = doc_bene_count) %>% 
-        mutate(base_year = year)
+               base_year_bene_count = doc_bene_count,
+               base_year = self$base_year)
     },
     
-    read_change_year_source = function(year = self$change_year) {
+    read_change_year_source = function() {
       self$change_data <- Kmisc::kLoad(paste0('data/source_tables/study_group_', self$drug_class,
-                                            '_', year, '.rData')) %>% 
-        select(NPI,
-               doc_state,
-               doc_specialty,
-               change_year_class_claims = total_class_claims,
+                                            '_', self$change_year, '.rData')) %>% 
+        mutate(change_year_class_claims = total_class_claims,
                change_year_target_claims = total_target_claims, 
                change_year_payments = total_target_payment_number,
-               change_year_bene_count = doc_bene_count) %>% 
-        mutate(change_year = year)
+               change_year_bene_count = doc_bene_count, 
+               change_year = self$change_year)
     },
     
     merge_source_data = function() {
       self$combined_data <- self$base_data %>% 
         inner_join(self$change_data, by = 'NPI') %>% 
+        select(NPI, doc_specialty, doc_state, doc_bene_count, doc_total_claims,
+               doc_mapd_claims, doc_lis_claims, total_target_claims, total_class_claims,
+               total_target_payment_number, contains('base_year'), contains('change_year')) %>% 
         arrange(NPI)
     },
     
-    tidy_combined_data = function(type = self$figure_type) {
+    build_figure_data = function(type = self$figure_type) {
       
-      self$tidy_data <- self$combined_data %>% 
+      self$figure_data <- self$combined_data %>% 
+        select(NPI, doc_specialty, doc_state, doc_bene_count,
+               contains('base_year'), conatains('change_year')) %>% 
         mutate(
           paid_group = ifelse(is.na(base_year_payments) & is.na(change_year_payments), 'No Meals',
                               ifelse(!is.na(base_year_payments) & is.na(change_year_payments), 'Base Year Meal',
@@ -90,7 +94,7 @@ build_changer_data <- R6::R6Class(
         ) 
       
       if (type != 'scatter') {
-        self$tidy_data <- self$tidy_data %>% 
+        self$figure_data <- self$figure_data %>% 
           group_by(year, paid_group) %>%
           summarise(
             group_count = n(),
@@ -100,7 +104,7 @@ build_changer_data <- R6::R6Class(
             mean_target_per_bene = round(mean(target_per_bene), 1)
           )
       } else {
-        self$tidy_data <- self$tidy_data %>% 
+        self$figure_data <- self$figure_data %>% 
           arrange(NPI, year) %>% 
           group_by(NPI, paid_group) %>% 
           summarise(
@@ -111,11 +115,14 @@ build_changer_data <- R6::R6Class(
             delta_target_per_bene = diff(target_per_bene)
           )
       }
-      
+    },
+    
+    build_analysis_data = function(type = self$analysis_type) {
+      self$analysis_data <- self$combined_data
     },
     
     save_tables = function() {
-      change_data <- self$tidy_data
+      change_data <- self$figure_data
       save(change_data, file = paste0('data/source_tables/change_data_', self$drug_class, '.rData'))
     },
     
@@ -123,13 +130,20 @@ build_changer_data <- R6::R6Class(
       self$read_base_year_source()
       self$read_change_year_source()
       self$merge_source_data()
-      self$tidy_combined_data()
       if(!(self$figure_type %in% '')) {
-        figure <- build_figures$new(data = self$tidy_data, 
+        self$build_figure_data()
+        figure <- build_figures$new(data = self$figure_data, 
                                     class = self$drug_class, 
                                     type = self$figure_type)
         figure$build_figure_data()
         figure$build_figure()
+      }
+      if(!(self$analysis_type %in% '')) {
+        self$build_analysis_data()
+        analysis <- build_analysis$new(data = self$analysis_data,
+                                       class = self$drug_class,
+                                       type = self$analysis_type)
+        
       }
       self$save_tables()
     }
