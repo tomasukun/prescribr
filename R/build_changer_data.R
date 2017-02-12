@@ -42,7 +42,8 @@ build_changer_data <- R6::R6Class(
                base_year_bene_count = doc_bene_count,
                base_year = self$base_year) %>% 
         select(NPI, doc_specialty, doc_state, doc_gender, doc_mapd_claims, doc_lis_claims, 
-               doc_group_size, contains('base_year'))
+               doc_group_size, base_year_class_claims, base_year_target_claims, 
+               base_year_payments, base_year_bene_count, base_year)
     },
     
     read_change_year_source = function() {
@@ -53,7 +54,8 @@ build_changer_data <- R6::R6Class(
                change_year_payments = total_target_payment_number,
                change_year_bene_count = doc_bene_count, 
                change_year = self$change_year) %>% 
-        select(NPI, contains('change_year'))
+        select(NPI, change_year_class_claims, change_year_target_claims,
+               change_year_payments, change_year_bene_count, change_year)
     },
     
     merge_source_data = function() {
@@ -66,7 +68,10 @@ build_changer_data <- R6::R6Class(
       
       self$figure_data <- self$combined_data %>% 
         select(NPI, doc_specialty, doc_state, doc_bene_count,
-               contains('base_year'), conatains('change_year')) %>% 
+               base_year_class_claims, base_year_target_claims, 
+               base_year_payments, base_year_bene_count, base_year,
+               change_year_class_claims, change_year_target_claims,
+               change_year_payments, change_year_bene_count, change_year) %>% 
         mutate(
           paid_group = ifelse(is.na(base_year_payments) & is.na(change_year_payments), 'No Meals',
                               ifelse(!is.na(base_year_payments) & is.na(change_year_payments), 'Base Year Meal',
