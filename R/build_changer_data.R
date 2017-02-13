@@ -61,17 +61,6 @@ build_changer_data <- R6::R6Class(
     merge_source_data = function() {
       self$combined_data <- self$base_data %>% 
         inner_join(self$change_data, by = 'NPI') %>%
-        arrange(NPI)
-    },
-    
-    build_figure_data = function(type = self$figure_type) {
-      
-      self$figure_data <- self$combined_data %>% 
-        select(NPI, doc_specialty, doc_state, doc_bene_count,
-               base_year_class_claims, base_year_target_claims, 
-               base_year_payments, base_year_bene_count, base_year,
-               change_year_class_claims, change_year_target_claims,
-               change_year_payments, change_year_bene_count, change_year) %>% 
         mutate(
           paid_group = ifelse(is.na(base_year_payments) & is.na(change_year_payments), 'No Meals',
                               ifelse(!is.na(base_year_payments) & is.na(change_year_payments), 'Base Year Meal',
@@ -82,7 +71,24 @@ build_changer_data <- R6::R6Class(
                       -base_year_class_claims, -base_year_target_claims,
                       -change_year_class_claims, -change_year_target_claims, 
                       -base_year_bene_count, -change_year_bene_count, 
-                      -base_year_payments, -change_year_payments) %>%
+                      -base_year_payments, -change_year_payments) %>% 
+        group_by(NPI, year, doc_specialty, doc_state, doc_gender, 
+                 doc_mapd_claims, doc_lis_claims, doc_group_size, paid_group) %>%
+        summarise(target_claims = ifelse(year == self$base_year,
+                                         base_year_target_claims, change_year_target_claims),
+                  class_claims = ifelse(year == self$base_year,
+                                        base_year_class_claims, change_year_class_claims),
+                  bene_count = ifelse(year == self$base_year,
+                                      base_year_bene_count, change_year_bene_count),
+                  payment_count = ifelse(year == self$base_year,
+                                         base_year_payments, change_year_payments)) %>% 
+        mutate(payment_count = ifelse(payment_count %in% NA, 0, payment_count)) %>% 
+        arrange(NPI)
+    },
+    
+    build_figure_data = function(type = self$figure_type) {
+      
+      self$figure_data <- self$combined_data %>%
         group_by(NPI, year, paid_group) %>%
         summarise(target_claims = ifelse(year == self$base_year,
                                          base_year_target_claims, change_year_target_claims),
@@ -94,9 +100,7 @@ build_changer_data <- R6::R6Class(
                                          base_year_payments, change_year_payments)) %>%
         ungroup() %>%
         mutate(
-          target_per_bene = target_claims/(bene_count/1000),
-          payment_count = ifelse(payment_count %in% NA, 0, payment_count)
-        ) 
+          target_per_bene = target_claims/(bene_count/1000)) 
       
       if (type != 'scatter') {
         self$figure_data <- self$figure_data %>% 
