@@ -42,8 +42,8 @@ build_changer_data <- R6::R6Class(
                base_year_bene_count = doc_bene_count,
                base_year = self$base_year) %>% 
         select(NPI, doc_specialty, doc_state, doc_gender, doc_mapd_claims, doc_lis_claims, 
-               doc_group_size, base_year_class_claims, base_year_target_claims, 
-               base_year_payments, base_year_bene_count, base_year)
+               doc_group_size, doc_total_claims, doc_grad_year, base_year_class_claims,
+               base_year_target_claims, base_year_payments, base_year_bene_count, base_year)
     },
     
     read_change_year_source = function() {
@@ -72,17 +72,6 @@ build_changer_data <- R6::R6Class(
                       -change_year_class_claims, -change_year_target_claims, 
                       -base_year_bene_count, -change_year_bene_count, 
                       -base_year_payments, -change_year_payments) %>% 
-        group_by(NPI, year, doc_specialty, doc_state, doc_gender, 
-                 doc_mapd_claims, doc_lis_claims, doc_group_size, paid_group) %>%
-        summarise(target_claims = ifelse(year == self$base_year,
-                                         base_year_target_claims, change_year_target_claims),
-                  class_claims = ifelse(year == self$base_year,
-                                        base_year_class_claims, change_year_class_claims),
-                  bene_count = ifelse(year == self$base_year,
-                                      base_year_bene_count, change_year_bene_count),
-                  payment_count = ifelse(year == self$base_year,
-                                         base_year_payments, change_year_payments)) %>% 
-        mutate(payment_count = ifelse(payment_count %in% NA, 0, payment_count)) %>% 
         arrange(NPI)
     },
     
@@ -99,8 +88,8 @@ build_changer_data <- R6::R6Class(
                   payment_count = ifelse(year == self$base_year,
                                          base_year_payments, change_year_payments)) %>%
         ungroup() %>%
-        mutate(
-          target_per_bene = target_claims/(bene_count/1000)) 
+        mutate(target_per_bene = target_claims/(bene_count/1000),
+               payment_count = ifelse(payment_count %in% NA, 0, payment_count)) 
       
       if (type != 'scatter') {
         self$figure_data <- self$figure_data %>% 
@@ -127,7 +116,23 @@ build_changer_data <- R6::R6Class(
     },
     
     build_analysis_data = function(type = self$analysis_type) {
-      self$analysis_data <- self$combined_data
+      if(type %in% 'did') {
+        self$analysis_data <- self$combined_data %>% 
+          group_by(NPI, year, doc_specialty, doc_state, doc_gender, doc_total_claims,
+                   doc_grad_year, doc_mapd_claims, doc_lis_claims, doc_group_size, paid_group) %>%
+          summarise(target_claims = ifelse(year == self$base_year,
+                                           base_year_target_claims, change_year_target_claims),
+                    class_claims = ifelse(year == self$base_year,
+                                          base_year_class_claims, change_year_class_claims),
+                    bene_count = ifelse(year == self$base_year,
+                                        base_year_bene_count, change_year_bene_count),
+                    payment_count = ifelse(year == self$base_year,
+                                           base_year_payments, change_year_payments)) %>% 
+          ungroup() %>% 
+          mutate(payment_count = ifelse(payment_count %in% NA, 0, payment_count)) 
+      } else{
+        self$analysis_data <- self$combined_data
+      }
     },
     
     save_tables = function() {
@@ -148,7 +153,7 @@ build_changer_data <- R6::R6Class(
         figure$build_figure()
       }
       if(!(self$analysis_type %in% '')) {
-        self$build_analysis_data()
+        self$build_analysis_data(type = self$analysis_type)
         analysis <- build_analysis$new(data = self$analysis_data,
                                        class = self$drug_class,
                                        type = self$analysis_type)
