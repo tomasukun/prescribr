@@ -134,15 +134,21 @@ study_pop_library <- R6::R6Class(
     ),
     
     figure_drug_class_brand = c(
+      'statins' = 'Crestor',
       'nsaid' = 'Voltaren',
       'nasal_steroids' = 'Nasonex',
-      'neuropathic_pain' = 'Lyrica'
+      'neuropathic_pain' = 'Lyrica',
+      'osteoporosis' = 'Prolia',
+      'opthalmic_corticosteroid' = 'Durezol'
     ),
     
     figure_drug_class_formulary = c(
+      'statins' = 'Rosuvastatin',
       'nsaid' = 'Diclofenac',
       'nasal_steroids' = 'Mometasone',
-      'neuropathic_pain' = 'Pregabalin'
+      'neuropathic_pain' = 'Pregabalin',
+      'osteoporosis' = 'Denosumab',
+      'opthalmic_corticosteroid' = 'Difluprednate'
     )
     
   )
