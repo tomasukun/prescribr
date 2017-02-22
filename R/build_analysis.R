@@ -47,9 +47,7 @@ build_analysis <- R6::R6Class(
       } else if(self$drug_class %in% 'vaginal_cream') {
         self$analysis_data <- self$analysis_data %>% 
           mutate(
-            spec_cat = if_else(doc_specialty %in% model_spec$doc_spec$`Family Medicine`, 'Family Medicine',
-                               if_else(doc_specialty %in% model_spec$doc_spec$`OBGYN`, 'OBGYN',
-                                       if_else(doc_specialty %in% model_spec$doc_spec$`Internal Medicine`, "Internal Medicine", "Other"))))
+            spec_cat = if_else(doc_specialty %in% model_spec$doc_spec$`OBGYN`, 'OBGYN', "Other"))
       } else if(self$drug_class %in% 'opioids') {
         self$analysis_data <- self$analysis_data %>% 
           mutate(
