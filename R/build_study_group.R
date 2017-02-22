@@ -72,7 +72,6 @@ build_study_group <- R6::R6Class(
       self$filter_processed_data()
       self$save_study_population()
     }
-      
   )
 )
 
