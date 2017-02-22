@@ -64,6 +64,23 @@ study_pop_library <- R6::R6Class(
       grad_year_limits = c(1910, 2013)
     ),
     
+    analysis_vars = list(
+      doc_spec = list(
+        'Family Medicine' = c('Family Practice', 'Family Medicine', 'General Practice'),
+        'OBGYN' = c('Obstetrics & Gynecology', 'Obstetrics/Gynecology'),
+        'Internal Medicine' = c('Internal Medicine', 'Hospitalist'),
+        'Pain Management' = c('Interventional Pain Management', 'Pain Management'),
+        'Ophthalmology' = 'Ophthalmology'
+      ),
+      region = list(
+        "Northeast" = c("CT", "ME", "MA", "NH", "RI", "VT", "NY", "NJ", "PA"),
+        "Mountain West" = c("MT", "ID", "WY", "NV", "UT", "CO", "AZ", "NM"),
+        "Midwest" = c("IN", "IL", "MI", "OH", "WI", "IA", "KS", "MN", "MO", "NE", "ND", "SD"),
+        "South" = c("DE", "MD", "WV", "DC", "VA", "NC", "SC", "GA", "FL", "MS" , "AL", "TN", "KY", "TX", "OK", "AR", "LA"),
+        "Pacific West" = c("CA", "OR", "WA", "AK", "HI")
+      )
+    ),
+    
     study_drugs = list(     
       statins = stringr::str_c('LIVALO', 'CRESTOR', 'LIPITOR', 'ZOCOR',
                                'LESCOL', 'LESCOL XL', 'ALTOPREV', 'MEVACOR',
