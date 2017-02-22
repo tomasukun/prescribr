@@ -158,7 +158,7 @@ build_changer_data <- R6::R6Class(
                                        class = self$drug_class,
                                        type = self$analysis_type)
         analysis$build_analysis_vars()
-        analysis$build_model()
+        analysis$build_model(self$drug_class)
       }
       self$save_tables()
     }
