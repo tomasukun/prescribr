@@ -84,11 +84,11 @@ build_figures <- R6::R6Class(
                                    aes(x = paid_group, y = change)) +
           geom_bar(width = 0.25, fill = 'grey80', stat = 'identity') +
           geom_hline(yintercept = 0, col = "black", lwd = 0.1) +
-          geom_hline(yintercept = c(seq(-8,-1), seq(1,8)), col = "white", lwd = 0.6) +
+          geom_hline(yintercept = c(seq(-10, 13), seq(-10, 13)), col = "white", lwd = 0.6) +
           ylab(sprintf("Change in %s (%s \U00AE) Prescribing Rate per 1000 Beneficiaries \n",
                        self$target_formulary_name, self$target_brand_name)) +
           xlab("") +
-          scale_y_continuous(limits = c(-8, 8), breaks = seq(-8, 8, 1), expand = c(0,0)) +
+          scale_y_continuous(limits = c(-10, 13), breaks = seq(-10, 13, 1), expand = c(0,0)) +
           scale_x_discrete(labels = c('None', '2013 Only', '2014 Only', 'Both Years')) +
           theme(axis.text = element_text(face = "bold", size = 17, colour = "black")) +
           theme(panel.background = element_rect(colour = "white", fill = "white")) +
@@ -142,7 +142,7 @@ build_figures <- R6::R6Class(
           ylab(sprintf("%s (%s \U00AE) Prescribing Rate per 1000 Beneficiaries \n",
                        self$target_formulary_name, self$target_brand_name)) +
           xlab("") +
-          scale_y_continuous(limits = c(0, 210), breaks = seq(0, 210, 15), expand = c(0,0)) +
+          scale_y_continuous(limits = c(95, 225), breaks = seq(95, 225, 10), expand = c(0,0)) +
           theme(axis.text = element_text(face = "bold", size = 17, colour = "black")) +
           theme(panel.background = element_rect(colour = "white", fill = "white")) +
           theme(axis.line = element_line(colour = "black")) +
