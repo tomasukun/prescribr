@@ -123,7 +123,7 @@ study_pop_library <- R6::R6Class(
       'voltaren' = 'VOLTAREN',
       'nasonex' = 'NASONEX',
       'lyrica' = 'LYRICA',
-      'lotemax' = 'LOTEMAX|LOTEMAX GEL|LOTEMAX OINTMENT',
+      'lotemax' = 'LOTEMAX',
       'besivance' = 'BESIVANCE',
       'estrace' = 'ESTRACE',
       'oxycontin' = 'OXYCONTIN'
@@ -137,7 +137,7 @@ study_pop_library <- R6::R6Class(
       'voltaren' = 'VOLTAREN Gel',
       'nasonex' = 'NASONEX|NASONEX Respiratory',
       'lyrica' = 'LYRICA',
-      'lotemax' = 'LOTEMAX',
+      'lotemax' = 'LOTEMAX|LOTEMAX GEL|LOTEMAX OINTMENT',
       'besivance' = 'BESIVANCE',
       'estrace' = 'ESTRACE CREAM',
       'oxycontin' = 'OXYCONTIN'
