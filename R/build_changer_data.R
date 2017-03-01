@@ -100,7 +100,8 @@ build_changer_data <- R6::R6Class(
             total_claims = sum(target_claims, na.rm = TRUE),
             total_class_claims = sum(class_claims, na.rm = TRUE),
             mean_prescribing_rate = round(mean(target_claims), 1),
-            mean_target_per_bene = round(mean(target_per_bene), 1)
+            mean_target_per_bene = round(mean(target_per_bene), 1),
+            mean_class_per_bene = round(mean(class_per_bene), 1)
           )
       } else {
         self$figure_data <- self$figure_data %>% 
