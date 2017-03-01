@@ -62,10 +62,10 @@ build_changer_data <- R6::R6Class(
       self$combined_data <- self$base_data %>% 
         inner_join(self$change_data, by = 'NPI') %>%
         mutate(
-          paid_group = ifelse(is.na(base_year_payments) & is.na(change_year_payments), 'No Meals',
-                              ifelse(!is.na(base_year_payments) & is.na(change_year_payments), 'Base Year Meal',
-                                     ifelse(is.na(base_year_payments) & !is.na(change_year_payments), 'Change Year Meal',
-                                            'Both Year Meals')))
+          paid_group = ifelse(is.na(base_year_payments) & is.na(change_year_payments), 'None',
+                              ifelse(!is.na(base_year_payments) & is.na(change_year_payments), '2013 Only',
+                                     ifelse(is.na(base_year_payments) & !is.na(change_year_payments), '2014 Only',
+                                            '2013 and 2014')))
         ) %>% 
         tidyr::gather(key = 'year_vars', value = 'year', base_year, change_year,
                       -base_year_class_claims, -base_year_target_claims,
