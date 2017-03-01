@@ -31,8 +31,8 @@ build_figures <- R6::R6Class(
                                           names(self$figure_drug_class_brand),
                                           self$figure_drug_class_brand)
       self$figure_data$paid_group <- factor(self$figure_data$paid_group, 
-                                            levels = c('No Meals', 'Base Year Meal', 
-                                                       'Change Year Meal', 'Both Year Meals'))
+                                            levels = c('None', '2013 Only', 
+                                                       '2014 Only', '2013 and 2014'))
       if(self$type == 'script-rate') {
         self$figure_data <- self$figure_data %>%
           select(year, paid_group, mean_prescribing_rate) 
@@ -44,7 +44,7 @@ build_figures <- R6::R6Class(
             change = `2014` - `2013`,
             percent_diff = round(100*(`2014` - `2013`)/`2013`)
           )
-      } else if(self$type %in% c('scatter', 'slopes')) {
+      } else if(self$type %in% c('scatter', 'slopes', 'class-slopes')) {
         self$figure_data <- self$figure_data
       } else{
         cat(sprintf('%s is not a supported figure type \n\n figure data not created', self$type))
@@ -159,12 +159,12 @@ build_figures <- R6::R6Class(
       } else if(self$type == 'class-slopes') {
         annotate_text <- self$figure_data %>%
           select(year, paid_group, class_per_bene) %>%
-          tidyr::spread(year, mean_target_per_bene) %>%
+          tidyr::spread(year, class_per_bene) %>%
           mutate(
             change = `2014` - `2013`,
             percent_diff = round(100*(`2014` - `2013`)/`2013`, 1))
         figure <- ggplot2::ggplot(self$figure_data, 
-                                  aes(x = year, y = mean_target_per_bene, colour = paid_group)) + 
+                                  aes(x = year, y = class_per_bene, colour = paid_group)) + 
           geom_line(aes(group = paid_group), linetype = 1, size = 1.5) +  
           geom_point(size = 3, fill = 'white') +
           annotate("text", x = 2.15, y = annotate_text$`2014`, 
@@ -193,7 +193,7 @@ build_figures <- R6::R6Class(
       browser()
       jpeg(filename = paste0(self$shared_docs_dir, 'figure_changer_analysis_', 
                              self$drug_class, '_', self$type, '.jpeg'),
-           width = 1250, height = 1150, quality = 100, units = "px", pointsize = 12)
+           width = 1150, height = 1275, quality = 100, units = "px", pointsize = 12)
       figure
       dev.off()
     }
