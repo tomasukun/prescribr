@@ -17,20 +17,20 @@ build_changer_data <- R6::R6Class(
     change_year = NULL,
     drug_class = NULL,
     figure_type = '',
-    analysis_type = '',
+    model_type = '',
     base_data = data_frame(),
     change_data = data_frame(),
     combined_data = data_frame(),
     figure_data = data_frame(),
-    analysis_data = data_frame(),
+    model_data = data_frame(),
     
     initialize = function(base_year = '2013', change_year = '2014', drug_class = 'statins',
-                          figure_type = '', analysis_type = '') {
+                          figure_type = '', model_type = '') {
       self$base_year <- base_year
       self$change_year <- change_year
       self$drug_class <- drug_class
       self$figure_type <- figure_type
-      self$analysis_type <- analysis_type
+      self$model_type <- model_type
     },
     
     read_base_year_source = function() {
@@ -89,6 +89,7 @@ build_changer_data <- R6::R6Class(
                                          base_year_payments, change_year_payments)) %>%
         ungroup() %>%
         mutate(target_per_bene = target_claims/(bene_count/1000),
+               class_per_bene = class_claims/(bene_count/1000),
                payment_count = ifelse(payment_count %in% NA, 0, payment_count)) 
       
       if (type != 'scatter') {
@@ -115,9 +116,9 @@ build_changer_data <- R6::R6Class(
       }
     },
     
-    build_analysis_data = function(type = self$analysis_type) {
+    build_model_data = function(type = self$model_type) {
       if(type %in% 'did') {
-        self$analysis_data <- self$combined_data %>% 
+        self$model_data <- self$combined_data %>% 
           group_by(NPI, year, doc_specialty, doc_state, doc_gender, doc_total_claims,
                    doc_grad_year, doc_mapd_claims, doc_lis_claims, doc_group_size, paid_group) %>%
           summarise(target_claims = ifelse(year == self$base_year,
@@ -131,7 +132,7 @@ build_changer_data <- R6::R6Class(
           ungroup() %>% 
           mutate(payment_count = ifelse(payment_count %in% NA, 0, payment_count)) 
       } else{
-        self$analysis_data <- self$combined_data
+        self$model_data <- self$combined_data
       }
     },
     
@@ -152,13 +153,13 @@ build_changer_data <- R6::R6Class(
         figure$build_figure_data()
         figure$build_figure()
       }
-      if(!(self$analysis_type %in% '')) {
-        self$build_analysis_data(type = self$analysis_type)
-        analysis <- build_analysis$new(data = self$analysis_data,
-                                       class = self$drug_class,
-                                       type = self$analysis_type)
-        analysis$build_analysis_vars()
-        analysis$build_model(self$drug_class)
+      if(!(self$model_type %in% '')) {
+        self$build_model_data(type = self$model_type)
+        analysis <- build_model$new(data = self$model_data, 
+                                    class = self$drug_class, 
+                                    type = self$model_type)
+        analysis$build_model_vars()
+        analysis$build_model_estimates(self$drug_class)
       }
       self$save_tables()
     }
