@@ -153,27 +153,25 @@ build_figures <- R6::R6Class(
           theme(axis.title = element_text(hjust = 0.5)) +
           theme(legend.key.size = unit(2, "cm"),
                 legend.text = element_text(size = 12, face = "bold")) +
-          guide_legend(title = 'Receipt of Payment') +
           ggtitle(sprintf("%s", self$target_brand_name)) +
           theme(title = element_text( size = 18, color = "black", hjust = 0.5, face = "bold"))
       } else if(self$type == 'class-slopes') {
         annotate_text <- self$figure_data %>%
-          select(year, paid_group, class_per_bene) %>%
-          tidyr::spread(year, class_per_bene) %>%
+          select(year, paid_group, mean_class_per_bene) %>%
+          tidyr::spread(year, mean_class_per_bene) %>%
           mutate(
             change = `2014` - `2013`,
             percent_diff = round(100*(`2014` - `2013`)/`2013`, 1))
         figure <- ggplot2::ggplot(self$figure_data, 
-                                  aes(x = year, y = class_per_bene, colour = paid_group)) + 
+                                  aes(x = year, y = mean_class_per_bene, colour = paid_group)) + 
           geom_line(aes(group = paid_group), linetype = 1, size = 1.5) +  
           geom_point(size = 3, fill = 'white') +
-          annotate("text", x = 2.15, y = annotate_text$`2014`, 
+          annotate("text", x = 2.15, y = annotate_text$`2014`+ 5, 
                    label = str_c(annotate_text$percent_diff, '%'), size = 12) +
-          scale_colour_brewer(palette = 'Spectral') +
-          ylab(sprintf("%s (%s \U00AE) Prescribing Rate per 1000 Beneficiaries \n",
-                       self$target_formulary_name, self$target_brand_name)) +
+          scale_colour_brewer("Receipt of Payments", palette = 'Spectral') +
+          ylab("Prescribing Rate per 1000 Beneficiaries \n") +
           xlab("") +
-          scale_y_continuous(limits = c(95, 225), breaks = seq(95, 225, 10), expand = c(0,0)) +
+          scale_y_continuous(limits = c(750, 1350), breaks = seq(750, 1350, 50), expand = c(0,0)) +
           theme(axis.text = element_text(face = "bold", size = 17, colour = "black")) +
           theme(panel.background = element_rect(colour = "white", fill = "white")) +
           theme(axis.line = element_line(colour = "black")) +
@@ -182,10 +180,9 @@ build_figures <- R6::R6Class(
           theme(panel.grid.major.y = element_line(colour = "white")) +
           theme(axis.ticks = element_line(colour = "black")) +
           theme(axis.title = element_text(hjust = 0.5)) +
-          theme(legend.key.size = unit(2, "cm"),
-                legend.text = element_text(size = 12, face = "bold")) +
-          guide_legend(title = 'Receipt of Payment') +
-          ggtitle(sprintf("%s", self$target_brand_name)) +
+          theme(legend.key.size = unit(2.1, "cm"),
+                legend.text = element_text(size = 14, face = "bold")) +
+          ggtitle(sprintf("%s", str_to_title(self$drug_class))) +
           theme(title = element_text( size = 18, color = "black", hjust = 0.5, face = "bold"))
       } else {
         stop('specify correct figure type')
@@ -193,7 +190,7 @@ build_figures <- R6::R6Class(
       browser()
       jpeg(filename = paste0(self$shared_docs_dir, 'figure_changer_analysis_', 
                              self$drug_class, '_', self$type, '.jpeg'),
-           width = 1150, height = 1275, quality = 100, units = "px", pointsize = 12)
+           width = 1150, height = 1285, quality = 100, units = "px", pointsize = 12)
       figure
       dev.off()
     }
