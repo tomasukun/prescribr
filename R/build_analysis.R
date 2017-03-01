@@ -65,7 +65,7 @@ build_analysis <- R6::R6Class(
     
     build_model = function(class = self$drug_class) {
       if(self$type == 'did') {
-        cat('Difference-in-Difference Analysis (DID) \n')
+        message('Difference-in-Difference Analysis (DID) \n')
         if(class %in% c('opthalmic_corticosteroid', 'opthalmic_antibiotic')) {
           did_glm <- glm(cbind(target_claims, class_claims) ~ factor(paid) + factor(year) + did + 
                            factor(grad_year_cat) + total_vol_per100 +
@@ -81,10 +81,10 @@ build_analysis <- R6::R6Class(
         }
 
         summary(did_glm)
-        cat('Odds Ratios \n')
+        message('Odds Ratios \n')
         exp(cbind(OR = coef(did_glm), confint(did_glm)))
         
-        cat('DID with Robust Standard Errors \n')
+        message('DID with Robust Standard Errors \n')
         cov <- sandwich::vcovHC(did_glm, type = "HC0")
         std_err <- sqrt(diag(cov))
         estimation <- data_frame(coefficients = names(did_glm$coefficients), 
@@ -95,7 +95,7 @@ build_analysis <- R6::R6Class(
                                  LL = coef(did_glm) - qnorm(0.975)  * std_err, 
                                  UL = coef(did_glm) + qnorm(0.975)  * std_err)
         estimation
-        cat('Odds Ratios \n')
+        message('Odds Ratios \n')
         or_estimation <- estimation %>% 
           select(coefficients, estimate, LL, UL) %>% 
           mutate_if(is.numeric, exp)
