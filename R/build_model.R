@@ -4,8 +4,8 @@
 #' @import stringr
 #' @import tidyr
 
-build_analysis <- R6::R6Class(
-  'build_analysis',
+build_model <- R6::R6Class(
+  'build_model',
   inherit = build_changer_data,
   public = list(
     drug_class = '',
@@ -18,7 +18,7 @@ build_analysis <- R6::R6Class(
       self$drug_class <- class
     },
     
-    build_analysis_vars = function() {
+    build_model_vars = function() {
       model_spec = self$analysis_vars
       
       self$analysis_data <- self$analysis_data %>% 
@@ -63,7 +63,7 @@ build_analysis <- R6::R6Class(
       }
     },
     
-    build_model = function(class = self$drug_class) {
+    build_model_estimates = function(class = self$drug_class) {
       if(self$type == 'did') {
         message('Difference-in-Difference Analysis (DID) \n')
         if(class %in% c('opthalmic_corticosteroid', 'opthalmic_antibiotic')) {
