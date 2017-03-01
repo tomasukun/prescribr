@@ -64,6 +64,23 @@ study_pop_library <- R6::R6Class(
       grad_year_limits = c(1910, 2013)
     ),
     
+    analysis_vars = list(
+      doc_spec = list(
+        'Family Medicine' = c('Family Practice', 'Family Medicine', 'General Practice'),
+        'OBGYN' = c('Obstetrics & Gynecology', 'Obstetrics/Gynecology'),
+        'Internal Medicine' = c('Internal Medicine', 'Hospitalist'),
+        'Pain Management' = c('Interventional Pain Management', 'Pain Management'),
+        'Ophthalmology' = 'Ophthalmology'
+      ),
+      region = list(
+        "Northeast" = c("CT", "ME", "MA", "NH", "RI", "VT", "NY", "NJ", "PA"),
+        "Mountain West" = c("MT", "ID", "WY", "NV", "UT", "CO", "AZ", "NM"),
+        "Midwest" = c("IN", "IL", "MI", "OH", "WI", "IA", "KS", "MN", "MO", "NE", "ND", "SD"),
+        "South" = c("DE", "MD", "WV", "DC", "VA", "NC", "SC", "GA", "FL", "MS" , "AL", "TN", "KY", "TX", "OK", "AR", "LA"),
+        "Pacific West" = c("CA", "OR", "WA", "AK", "HI")
+      )
+    ),
+    
     study_drugs = list(     
       statins = stringr::str_c('LIVALO', 'CRESTOR', 'LIPITOR', 'ZOCOR',
                                'LESCOL', 'LESCOL XL', 'ALTOPREV', 'MEVACOR',
@@ -75,11 +92,11 @@ study_pop_library <- R6::R6Class(
                                  'ZYVOX', 'SIVEXTRO', 'VIBRAMYCIN', 'DOXY 100', 'DORYX', 'DOXYCYCLINE HYCLATE',
                                  'MORGIDOX', 'ORACEA', 'DOXYCYCLINE MONOHYDRATE', 'MINOCIN', 'SOLODYN', 
                                  'MINOCYCLINE HCL', sep = '|'),
-      opthalmic_corticosteroid = stringr::str_c('MAXIDEX', 'DEXAMETHASONE SODIUM PHOSPHATE', 'DUREZOL', 
-                                                'FLUOROMETHOLONE', 'FML FORTE', 'FML', 'FML S.O.P', 
-                                                'FLAREX', 'LOTEMAX', 'PRED FORTE', 'PRED MILD', 
-                                                'PREDNISOLONE ACETATE', 'OMNIPRED', 'PREDNISOLONE SODIUM PHOSPHATE',
-                                                'VEXOL', sep = '|'),
+      opthalmic_corticosteroid = stringr::str_c("MAXIDEX", "DEXAMETHASONE SODIUM PHOSPHATE", 
+                                                "DUREZOL", "FLUOROMETHOLONE", "FML FORTE", "FML", 
+                                                "FML S.O.P.", "FLAREX", "LOTEMAX", "PRED FORTE", 
+                                                "PRED MILD", "PREDNISOLONE ACETATE", "OMNIPRED", 
+                                                "PREDNISOLONE SODIUM PHOSPHATE", "VEXOL", sep = '|'),
       osteoporosis = stringr::str_c('ALENDRONATE SODIUM', 'BINOSTO', 'FOSAMAX', 'FOSAMAX PLUS D',
                                     'IBANDRONATE SODIUM', 'BONIVA', 'ATELVIA', 'ACTONEL', 
                                     'RISEDRONATE SODIUM', 'ZOLEDRONIC ACID', 'ZOMETA', 'RECLAST',
@@ -100,7 +117,19 @@ study_pop_library <- R6::R6Class(
                                       "FLONASE","FLUTICASONE PROPIONATE","NASONEX","NASACORT AQ",
                                       "TRIAMCINOLONE ACETONIDE", sep = '|'),
       neuropathic_pain = stringr::str_c("GRALISE", "GABAPENTIN", "NEURONTIN","HORIZANT","LYRICA",
-                                        sep = '|')
+                                        sep = '|'),
+      opthalmic_antibiotic = stringr::str_c("BESIVANCE", "CIPROFLOXACIN HCL", "CILOXAN", "ZYMAXID",
+                                            "GATIFLOXACIN", "LEVOFLOXACIN", "MOXEZA", "VIGAMOX",
+                                            "OCUFLOX", "OFLOXACIN", sep = "|"),
+      vaginal_cream = stringr::str_c("ESTRACE", "ESTRING", "VAGIFEM", "CLIMARA", "ALORA",
+                                     "VIVELLE-DOT", "ESTROGEL", "PREMARIN", "MENEST",
+                                     "ESTROPIPATE", sep = "|"),
+      opioids = stringr::str_c("BUTRANS", "DURAGESIC", "FENTANYL", "ZOHYDRO ER", "EXALGO", 
+                               "HYDROMORPHONE ER", "AVINZA", "KADIAN", "MS CONTIN", 
+                               "MORPHINE SULFATE ER", "OXYCONTIN", "OXYCODONE HCL ER", 
+                               "XARTEMIS XR", "OPANA ER", "OXYMORPHONE HCL ER", "NUCYNTA ER", 
+                               "ULTRAM ER", "TRAMADOL HCL ER", "DOLOPHINE HCL", 
+                               "METHADONE INTENSOL", "METHADONE HCL", sep = "|")
     ),
     
     partd_target = c(
@@ -110,7 +139,11 @@ study_pop_library <- R6::R6Class(
       'prolia' = 'PROLIA',
       'voltaren' = 'VOLTAREN',
       'nasonex' = 'NASONEX',
-      'lyrica' = 'LYRICA'
+      'lyrica' = 'LYRICA',
+      'lotemax' = 'LOTEMAX',
+      'besivance' = 'BESIVANCE',
+      'estrace' = 'ESTRACE',
+      'oxycontin' = 'OXYCONTIN'
     ),
 
     open_payments_target = c(
@@ -120,7 +153,11 @@ study_pop_library <- R6::R6Class(
       'prolia' = 'PROLIA',
       'voltaren' = 'VOLTAREN Gel',
       'nasonex' = 'NASONEX|NASONEX Respiratory',
-      'lyrica' = 'LYRICA'
+      'lyrica' = 'LYRICA',
+      'lotemax' = 'LOTEMAX|LOTEMAX GEL|LOTEMAX OINTMENT',
+      'besivance' = 'BESIVANCE',
+      'estrace' = 'ESTRACE CREAM',
+      'oxycontin' = 'OXYCONTIN'
      ),
     
     target_drug_manufacturer = c(
@@ -130,7 +167,11 @@ study_pop_library <- R6::R6Class(
       'prolia' = 'Amgen Inc.|Medtronic Sofamor Danek USA, Inc.',
       'voltaren' = 'Endo Pharmaceuticals Inc.',
       'nasonex' = 'Merck Sharp & Dohme Corporation|COMSORT, Inc',
-      'lyrica' = 'Pfizer'
+      'lyrica' = 'Pfizer', 
+      'lotemax' = 'Bausch and Lomb Inc.|Valeant Pharmaceuticals North America LLC',
+      'besivance' = 'Bausch and Lomb Inc.|Valeant Pharmaceuticals North America LLC',
+      'estrace' = 'Actavis Pharma Inc',
+      'oxycontin' = 'Purdue Pharma L.P.'
     ),
     
     figure_drug_class_brand = c(
@@ -139,7 +180,10 @@ study_pop_library <- R6::R6Class(
       'nasal_steroids' = 'Nasonex',
       'neuropathic_pain' = 'Lyrica',
       'osteoporosis' = 'Prolia',
-      'opthalmic_corticosteroid' = 'Durezol'
+      'opthalmic_corticosteroid' = 'Lotemax',
+      'opthalmic_antibiotic' = 'Besivance',
+      'vaginal_cream' = 'Estrace',
+      'opioids' = 'Oxycontin'
     ),
     
     figure_drug_class_formulary = c(
@@ -148,8 +192,12 @@ study_pop_library <- R6::R6Class(
       'nasal_steroids' = 'Mometasone',
       'neuropathic_pain' = 'Pregabalin',
       'osteoporosis' = 'Denosumab',
-      'opthalmic_corticosteroid' = 'Difluprednate'
+      'opthalmic_corticosteroid' = 'Loteprednol',
+      'opthalmic_antibiotic' = 'Besifloxacin',
+      'vaginal_cream' = 'Estradiol',
+      'opioids' = 'Oxycodone'
     )
     
   )
 )
+
