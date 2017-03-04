@@ -108,6 +108,7 @@ build_changer_data <- R6::R6Class(
                   payment_count = ifelse(year == self$base_year,
                                          base_year_payments, change_year_payments)) %>%
         ungroup() %>%
+        filter(!is.na(bene_count)) %>% 
         mutate(target_per_bene = target_claims/(bene_count/1000),
                class_per_bene = class_claims/(bene_count/1000),
                payment_count = ifelse(payment_count %in% NA, 0, payment_count)) 
