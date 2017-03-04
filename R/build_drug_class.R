@@ -90,8 +90,8 @@ build_drug_class <- R6::R6Class(
                -doc_drug_class_day_supply, -doc_drug_class_cost) %>% 
         distinct(NPI, .keep_all = TRUE) %>% 
         ungroup()
-      # number of docs with over 100 claims in class
-      self$study_group_pop[[paste0(self$drug_class, '_', self$year)]]$claim_count_100plus <- nrow(self$final_study_group)
+      # number of docs with over 50 claims in class
+      self$study_group_pop[[paste0(self$drug_class, '_', self$year)]]$claim_count_50plus <- nrow(self$final_study_group)
     },
     
     read_openpay_drug_class = function() {
@@ -125,11 +125,9 @@ build_drug_class <- R6::R6Class(
               is.na(payment_device_4) &
               is.na(payment_device_5))
             )
-          
         # number of docs who received a tagged payment
         self$study_group_pop[[paste0(self$drug_class, '_', self$year)]]$tagged_payment <- nrow(distinct(study_group_paid, NPI))
-        study_group_paid <- study_group_paid %>%  
-          filter(payment_type == 'Food and Beverage')
+       
         # number of docs who recieved a food and beverage payment
         self$study_group_pop[[paste0(self$drug_class, '_', self$year)]]$meal_payment <- nrow(distinct(study_group_paid, NPI))
         
@@ -138,6 +136,7 @@ build_drug_class <- R6::R6Class(
                                     str_replace(tolower(self$openpay_target_drug), str_sub(tolower(self$openpay_target_drug), 1, 1), 
                                                 toupper(str_sub(self$openpay_target_drug, 1, 1))), 
                                     sep = '|')
+        
         study_group_target_paid <- study_group_paid %>% 
           filter(
             (str_detect(payment_drug_1, target_drug_regex) |
@@ -147,6 +146,7 @@ build_drug_class <- R6::R6Class(
                str_detect(payment_drug_5, target_drug_regex))
           ) %>% 
           group_by(NPI) %>% 
+          filter(all(payment_type == 'Food and Beverage')) %>% 
           mutate(
             total_target_payment_dollars = sum(payment_dollars, na.rm = TRUE),
             total_target_payment_number  = sum(payment_number, na.rm = TRUE)
@@ -155,6 +155,7 @@ build_drug_class <- R6::R6Class(
                  -starts_with('payment_drug'), -starts_with('payment_device')) %>% 
           distinct(NPI, .keep_all = TRUE) %>% 
           ungroup()
+        
         # distinct NON-TARGET PAID docs
         study_group_paid_non_target <- study_group_paid %>% 
           anti_join(study_group_target_paid, by = 'doc_id') %>% 
