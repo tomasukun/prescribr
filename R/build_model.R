@@ -18,6 +18,13 @@ build_model <- R6::R6Class(
       self$drug_class <- class
     },
     
+    run_model = function() {
+      private$build_model_vars()
+      private$build_model_estimates(class = self$drug_class)
+    }
+  ),
+  
+  private = list(
     build_model_vars = function() {
       model_spec = self$analysis_vars
       
@@ -29,10 +36,10 @@ build_model <- R6::R6Class(
                year = if_else(year == '2013', 0, 1),
                did = paid*year,
                region = if_else(doc_state %in% model_spec$region$`Northeast`, 'Northeast',
-                                   if_else(doc_state %in% model_spec$region$`Midwest`, 'Midwest', 
-                                           if_else(doc_state %in% model_spec$region$`South`, 'South',
-                                                   if_else(doc_state %in% model_spec$region$`Pacific West`, 'Pacific West',
-                                                           "Mountain West")))),
+                                if_else(doc_state %in% model_spec$region$`Midwest`, 'Midwest', 
+                                        if_else(doc_state %in% model_spec$region$`South`, 'South',
+                                                if_else(doc_state %in% model_spec$region$`Pacific West`, 'Pacific West',
+                                                        "Mountain West")))),
                group_size = if_else(doc_group_size < 2, 1,
                                     if_else(doc_group_size >= 2 & doc_group_size < 11, 2,
                                             if_else(doc_group_size >= 11 & doc_group_size < 51, 3, 4))),
@@ -64,8 +71,9 @@ build_model <- R6::R6Class(
     },
     
     build_model_estimates = function(class = self$drug_class) {
-      if(self$type == 'did') {
-        message('Difference-in-Difference Analysis (DID) \n')
+      
+      if(self$type == 'did-binomial') {
+        message('Difference-in-Difference Analysis of Target Scripts of Total Class Scripts\n')
         if(class %in% c('opthalmic_corticosteroid', 'opthalmic_antibiotic')) {
           did_glm <- glm(cbind(target_claims, class_claims) ~ factor(paid) + factor(year) + did + 
                            factor(grad_year_cat) + total_vol_per100 +
@@ -79,10 +87,10 @@ build_model <- R6::R6Class(
                            factor(gender) + doc_lis + doc_mapd,
                          data = self$analysis_data, family = 'binomial')
         }
-
-        summary(did_glm)
+        
+        print(summary(did_glm))
         message('Odds Ratios \n')
-        exp(cbind(OR = coef(did_glm), confint(did_glm)))
+        print(exp(cbind(OR = coef(did_glm), confint(did_glm))))
         
         message('DID with Robust Standard Errors \n')
         cov <- sandwich::vcovHC(did_glm, type = "HC0")
@@ -99,9 +107,18 @@ build_model <- R6::R6Class(
         or_estimation <- estimation %>% 
           select(coefficients, estimate, LL, UL) %>% 
           mutate_if(is.numeric, exp)
-        or_estimation
+        print(or_estimation)
+      } else if(self$type == 'did-linear') {
+        message('Difference-in-Difference Analysis of Target Scripts\n')
+        
+        did_lm <- lm(target_per_bene ~ factor(paid) + factor(year) + did + 
+                       factor(spec_cat) + factor(grad_year_cat) + total_vol_per100 +
+                       factor(region) + factor(group_size) + 
+                       factor(gender) + doc_lis + doc_mapd,
+                     data = self$analysis_data)
+        print(summary(did_lm))
       } else {
-        cat(sprintf('%s is not a supported method \n\n analysis not run', self$type))
+        cat(sprintf('\n%s is not a supported method...analysis not run', self$type))
       }
     }
   )
