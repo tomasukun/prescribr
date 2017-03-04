@@ -46,12 +46,12 @@ study_pop_library <- R6::R6Class(
     
     study_group_pop = list(
       statins_2013 = list(
-        claim_count_100plus = NULL,
+        claim_count_50plus = NULL,
         meal_payment = NULL,
         tagged_payment = NULL
       ),
       statins_2014 = list(
-        claim_count_100plus = NULL,
+        claim_count_50plus = NULL,
         meal_payment = NULL,
         tagged_payment = NULL
       )
@@ -59,7 +59,7 @@ study_pop_library <- R6::R6Class(
     
     exclusion_criteria = list(
       doc = 'M.?D.?|D.?O.?',
-      claim_count = 100,
+      claim_count = 50,
       states = c(state.abb, 'DC'),
       grad_year_limits = c(1910, 2013)
     ),
@@ -129,7 +129,7 @@ study_pop_library <- R6::R6Class(
                                "MORPHINE SULFATE ER", "OXYCONTIN", "OXYCODONE HCL ER", 
                                "XARTEMIS XR", "OPANA ER", "OXYMORPHONE HCL ER", "NUCYNTA ER", 
                                "ULTRAM ER", "TRAMADOL HCL ER", "DOLOPHINE HCL", 
-                               "METHADONE INTENSOL", "METHADONE HCL", sep = "|")
+                               "METHADONE INTENSOL", "METHADONE HCL", "CONZIP", "RYZOLT", sep = "|")
     ),
     
     partd_target = c(
