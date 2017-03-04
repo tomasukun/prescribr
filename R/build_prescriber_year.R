@@ -102,9 +102,9 @@ build_prescriber_year <- R6::R6Class(
         filter(doc_state %in% self$exclusion_criteria$states)
       self$study_pop[[paste0('study_', self$year)]]$partd_us_docs <- nrow(self$partd_phys_source)
       # filtering docs with valid brand count
-      self$partd_phys_source <- self$partd_phys_source %>%
-        filter(!is.na(doc_brand_claims))
-      self$study_pop[[paste0('study_', self$year)]]$valid_brand_docs <- nrow(self$partd_phys_source)
+      # self$partd_phys_source <- self$partd_phys_source %>%
+      #   filter(!is.na(doc_brand_claims))
+      # self$study_pop[[paste0('study_', self$year)]]$valid_brand_docs <- nrow(self$partd_phys_source)
       # filtering docs in phys compare
       self$partd_phys_source <- self$partd_phys_source %>%
         inner_join(self$phys_compare_source, by = 'NPI')
