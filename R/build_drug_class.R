@@ -35,6 +35,17 @@ build_drug_class <- R6::R6Class(
                                                   self$target_drug_manufacturer)
     },
     
+    build_tables = function() {
+      private$read_partd_drug_class()
+      private$merge_partd_drug_class()
+      private$read_openpay_drug_class()
+      private$merge_openpay_drug_class()
+      private$save_drug_class()
+    }
+  ),
+  
+  private = list(
+    
     read_partd_drug_class = function() {
       
       self$partd_drug_class <- Kmisc::kLoad(paste0(self$processed_file_dir, self$year, 
@@ -48,8 +59,6 @@ build_drug_class <- R6::R6Class(
         filter(
           str_detect(doc_drug_class_brand_name, self$study_drugs[[self$drug_class]])
         )
-        
-      
     },
     
     merge_partd_drug_class = function() {
@@ -59,8 +68,7 @@ build_drug_class <- R6::R6Class(
       self$final_study_group <- self$final_study_group %>% 
         inner_join(self$partd_drug_class, by = 'NPI') %>% 
         filter(
-          !is.na(doc_drug_class_claims),
-          doc_drug_class_claims >= self$exclusion_criteria$claim_count
+          !is.na(doc_drug_class_claims)
         ) %>% 
         group_by(NPI) %>% 
         mutate(
@@ -77,13 +85,13 @@ build_drug_class <- R6::R6Class(
           total_target_drug_cost = sum(doc_drug_class_cost[doc_drug_class_brand_name == self$partd_target_drug],
                                        na.rm = TRUE)
         ) %>% 
+        filter(total_class_claims >= self$exclusion_criteria$claim_count) %>% 
         select(-doc_drug_class_bene_count, -doc_drug_class_claims, -doc_drug_class_brand_name,
                -doc_drug_class_day_supply, -doc_drug_class_cost) %>% 
         distinct(NPI, .keep_all = TRUE) %>% 
         ungroup()
       # number of docs with over 100 claims in class
       self$study_group_pop[[paste0(self$drug_class, '_', self$year)]]$claim_count_100plus <- nrow(self$final_study_group)
-        
     },
     
     read_openpay_drug_class = function() {
@@ -168,16 +176,7 @@ build_drug_class <- R6::R6Class(
       final_study_group <- self$final_study_group
       save(final_study_group,
            file = paste0('data/source_tables/', 'study_group_', self$drug_class, '_', self$year, '.rData'))
-    },
-    
-    build_tables = function() {
-      self$read_partd_drug_class()
-      self$merge_partd_drug_class()
-      self$read_openpay_drug_class()
-      self$merge_openpay_drug_class()
-      self$save_drug_class()
     }
-    
   )
 )
     
