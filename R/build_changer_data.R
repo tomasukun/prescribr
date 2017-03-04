@@ -33,6 +33,26 @@ build_changer_data <- R6::R6Class(
       self$model_type <- model_type
     },
     
+    build_tables = function() {
+      private$read_base_year_source()
+      private$read_change_year_source()
+      private$merge_source_data()
+      if(!(self$figure_type %in% '')) {
+        private$build_figure_data()
+        figure <- build_figures$new(data = self$figure_data, class = self$drug_class, type = self$figure_type)
+        figure$build_figure_data()
+        figure$build_figure()
+      }
+      if(!(self$model_type %in% '')) {
+        private$build_model_data(type = self$model_type)
+        analysis <- build_model$new(data = self$model_data, class = self$drug_class, type = self$model_type)
+        analysis$run_model()
+      }
+      self$save_tables()
+    }
+  ),
+  
+  private = list(
     read_base_year_source = function() {
       self$base_data <- Kmisc::kLoad(paste0('data/source_tables/study_group_', self$drug_class,
                                             '_', self$base_year, '.rData')) %>% 
@@ -118,7 +138,7 @@ build_changer_data <- R6::R6Class(
     },
     
     build_model_data = function(type = self$model_type) {
-      if(type %in% 'did') {
+      if(str_detect(type,'did')) {
         self$model_data <- self$combined_data %>% 
           group_by(NPI, year, doc_specialty, doc_state, doc_gender, doc_total_claims,
                    doc_grad_year, doc_mapd_claims, doc_lis_claims, doc_group_size, paid_group) %>%
@@ -131,7 +151,8 @@ build_changer_data <- R6::R6Class(
                     payment_count = ifelse(year == self$base_year,
                                            base_year_payments, change_year_payments)) %>% 
           ungroup() %>% 
-          mutate(payment_count = ifelse(payment_count %in% NA, 0, payment_count)) 
+          mutate(payment_count = ifelse(payment_count %in% NA, 0, payment_count),
+                 target_per_bene = target_claims/(bene_count/1000)) 
       } else{
         self$model_data <- self$combined_data
       }
@@ -140,30 +161,6 @@ build_changer_data <- R6::R6Class(
     save_tables = function() {
       change_data <- self$figure_data
       save(change_data, file = paste0('data/source_tables/change_data_', self$drug_class, '.rData'))
-    },
-    
-    build_tables = function() {
-      self$read_base_year_source()
-      self$read_change_year_source()
-      self$merge_source_data()
-      if(!(self$figure_type %in% '')) {
-        self$build_figure_data()
-        figure <- build_figures$new(data = self$figure_data, 
-                                    class = self$drug_class, 
-                                    type = self$figure_type)
-        figure$build_figure_data()
-        figure$build_figure()
-      }
-      if(!(self$model_type %in% '')) {
-        self$build_model_data(type = self$model_type)
-        analysis <- build_model$new(data = self$model_data, 
-                                    class = self$drug_class, 
-                                    type = self$model_type)
-        analysis$build_model_vars()
-        analysis$build_model_estimates(self$drug_class)
-      }
-      self$save_tables()
     }
-    
   )
 )
