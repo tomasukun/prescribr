@@ -142,7 +142,7 @@ build_figures <- R6::R6Class(
           ylab(sprintf("%s (%s \U00AE) Prescribing Rate per 1000 Beneficiaries \n",
                        self$target_formulary_name, self$target_brand_name)) +
           xlab("") +
-          scale_y_continuous(limits = c(80, 170), breaks = seq(80, 170, 10), expand = c(0,0)) +
+          scale_y_continuous(limits = c(90, 200), breaks = seq(90, 200, 20), expand = c(0,0)) +
           theme(axis.text = element_text(face = "bold", size = 17, colour = "black")) +
           theme(panel.background = element_rect(colour = "white", fill = "white")) +
           theme(axis.line = element_line(colour = "black")) +
