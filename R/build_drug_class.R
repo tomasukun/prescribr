@@ -90,7 +90,7 @@ build_drug_class <- R6::R6Class(
                -doc_drug_class_day_supply, -doc_drug_class_cost) %>% 
         distinct(NPI, .keep_all = TRUE) %>% 
         ungroup()
-      # number of docs with over 50 claims in class
+      # number of docs with over 100 claims in class
       self$study_group_pop[[paste0(self$drug_class, '_', self$year)]]$claim_count_50plus <- nrow(self$final_study_group)
     },
     
