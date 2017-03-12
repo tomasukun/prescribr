@@ -139,10 +139,10 @@ build_figures <- R6::R6Class(
           annotate("text", x = 2.15, y = annotate_text$`2014`, 
                    label = str_c(annotate_text$percent_diff, '%'), size = 12) +
           scale_colour_brewer("Receipt of Payments", palette = 'Spectral') +
-          ylab(sprintf("%s (%s \U00AE) Prescribing Rate per 1000 Beneficiaries \n",
+          ylab(sprintf("%s (%s \U00AE) Prescribing Rate \n",
                        self$target_formulary_name, self$target_brand_name)) +
           xlab("") +
-          scale_y_continuous(limits = c(5, 40), breaks = seq(5, 40, 5), expand = c(0,0)) +
+          scale_y_continuous(limits = c(50, 105), breaks = seq(50, 105, 5), expand = c(0,0)) +
           theme(axis.text = element_text(face = "bold", size = 17, colour = "black")) +
           theme(panel.background = element_rect(colour = "white", fill = "white")) +
           theme(axis.line = element_line(colour = "black")) +
