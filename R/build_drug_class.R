@@ -56,9 +56,8 @@ build_drug_class <- R6::R6Class(
                doc_drug_class_day_supply = doc_drug_total_day_supply, 
                doc_drug_class_cost = doc_drug_total_drug_cost,
                doc_drug_class_bene_count = doc_drug_bene_count) %>% 
-        filter(
-          str_detect(doc_drug_class_brand_name, self$study_drugs[[self$drug_class]])
-        )
+        #filter(doc_drug_class_brand_name == 'OXYCONTIN', doc_drug_class_claims >= 20)
+        filter(str_detect(doc_drug_class_brand_name, self$study_drugs[[self$drug_class]]))
     },
     
     merge_partd_drug_class = function() {
@@ -90,8 +89,8 @@ build_drug_class <- R6::R6Class(
                -doc_drug_class_day_supply, -doc_drug_class_cost) %>% 
         distinct(NPI, .keep_all = TRUE) %>% 
         ungroup()
-      # number of docs with over 100 claims in class
-      self$study_group_pop[[paste0(self$drug_class, '_', self$year)]]$claim_count_50plus <- nrow(self$final_study_group)
+      # number of docs with over X claims in class
+      self$study_group_pop[[paste0(self$drug_class, '_', self$year)]]$claim_count <- nrow(self$final_study_group)
     },
     
     read_openpay_drug_class = function() {
@@ -128,9 +127,6 @@ build_drug_class <- R6::R6Class(
         # number of docs who received a tagged payment
         self$study_group_pop[[paste0(self$drug_class, '_', self$year)]]$tagged_payment <- nrow(distinct(study_group_paid, NPI))
        
-        # number of docs who recieved a food and beverage payment
-        self$study_group_pop[[paste0(self$drug_class, '_', self$year)]]$meal_payment <- nrow(distinct(study_group_paid, NPI))
-        
         # distinct TARGET PAID docs
         target_drug_regex <- str_c(self$openpay_target_drug, tolower(self$openpay_target_drug),
                                     str_replace(tolower(self$openpay_target_drug), str_sub(tolower(self$openpay_target_drug), 1, 1), 
@@ -155,6 +151,9 @@ build_drug_class <- R6::R6Class(
                  -starts_with('payment_drug'), -starts_with('payment_device')) %>% 
           distinct(NPI, .keep_all = TRUE) %>% 
           ungroup()
+        
+        # number of docs who didnt receive a food and beverage payment
+        self$study_group_pop[[paste0(self$drug_class, '_', self$year)]]$meal_payment <- nrow(distinct(study_group_paid, NPI))
         
         # distinct NON-TARGET PAID docs
         study_group_paid_non_target <- study_group_paid %>% 
