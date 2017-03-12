@@ -46,12 +46,12 @@ study_pop_library <- R6::R6Class(
     
     study_group_pop = list(
       statins_2013 = list(
-        claim_count_50plus = NULL,
+        claim_count = NULL,
         meal_payment = NULL,
         tagged_payment = NULL
       ),
       statins_2014 = list(
-        claim_count_50plus = NULL,
+        claim_count = NULL,
         meal_payment = NULL,
         tagged_payment = NULL
       )
@@ -142,7 +142,12 @@ study_pop_library <- R6::R6Class(
                                "METHADONE INTENSOL", "METHADONE HCL", "AVINZA", "KADIAN", "MS CONTIN",
                                "MORPHINE SULFATE ER", "OXYCONTIN", "OXYCODONE HCL ER", "XARTEMIS XR",
                                "OPANA ER", "OXYMORPHONE HCL ER", "NUCYNTA ER", "CONZIP", "ULTRAM ER",
-                               "TRAMADOL HCL ER", "RYZOLT", "OXYCODONE HCL-IBUPROFEN", sep = "|")
+                               "TRAMADOL HCL ER", "RYZOLT", "OXYCODONE HCL-IBUPROFEN", sep = "|"),
+      oral_opioids = stringr::str_c("ZOHYDRO ER", "EXALGO", "HYDROMORPHONE ER", "AVINZA", "KADIAN",
+                                    "MS CONTIN", "MORPHINE SULFATE ER", "OXYCONTIN", "OXYCODONE HCL ER",
+                                    "XARTEMIS XR", "OPANA ER", "OXYMORPHONE HCL ER", "NUCYNTA ER",
+                                    "ULTRAM ER", "TRAMADOL HCL ER", "DOLOPHINE HCL", "METHADONE INTENSOL",
+                                    "METHADONE HCL", "CONZIP", "RYZOLT", sep = "|")
     ),
     
     partd_target = c(
@@ -196,7 +201,8 @@ study_pop_library <- R6::R6Class(
       'opthalmic_corticosteroid' = 'Lotemax',
       'opthalmic_antibiotic' = 'Besivance',
       'vaginal_cream' = 'Estrace',
-      'opioids' = 'Oxycontin'
+      'opioids' = 'Oxycontin',
+      'oral_opioids' = 'Oxycontin'
     ),
     
     figure_drug_class_formulary = c(
@@ -208,7 +214,8 @@ study_pop_library <- R6::R6Class(
       'opthalmic_corticosteroid' = 'Loteprednol',
       'opthalmic_antibiotic' = 'Besifloxacin',
       'vaginal_cream' = 'Estradiol',
-      'opioids' = 'Oxycodone'
+      'opioids' = 'Oxycodone',
+      'oral_opiods' = 'Oxycodone'
     )
     
   )
