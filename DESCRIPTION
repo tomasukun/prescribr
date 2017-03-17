@@ -13,11 +13,11 @@ Depends:
 Imports:
     stringr,
     ggplot2,
-    tidyr
-Suggests:
+    tidyr,
     readr,
     purrr,
     Kmisc,
     plyr,
     lubridate
+Suggests:
 RoxygenNote: 5.0.1

@@ -2,6 +2,7 @@
 
 language: R
 sudo: false
+warnings_are_errors: false
 #cache: packages
 before_install:
 #  - Rscript -e 'install.packages("devtools"); devtools::install_deps(".")'
@@ -14,7 +15,6 @@ before_install:
 install:
   - Rscript -e "0" --args --bootstrap-packrat
 #  - R -e "packrat::restore(restart = FALSE)"
-warnings_are_errors: false
 cache:
   directories: 
     - $TRAVIS_BUILD_DIR/packrat/
