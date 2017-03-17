@@ -1,9 +1,6 @@
 #' Builder Class for Drug Class Study Groups
 #' @import dplyr
-#' @importFrom plyr mapvalues
 #' @import stringr
-#' @import tidyr
-#' @import purrr
 
 build_study_group <- R6::R6Class(
   'build_study_group',

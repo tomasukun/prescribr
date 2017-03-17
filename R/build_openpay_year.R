@@ -1,8 +1,6 @@
 #' Builder Class for Open Payments data by year
 #' @import dplyr
 #' @import stringr
-#' @import tidyr
-#' @import purrr
 
 build_openpay_year <- R6::R6Class(
   'build_openpay_year',

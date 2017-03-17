@@ -1,9 +1,6 @@
 #' Builder for changer analysis, comparing two years of prescribing and payments
 #' @import dplyr
-#' @importFrom plyr mapvalues
 #' @import stringr
-#' @import tidyr
-#' @import purrr
  
 build_changer_data <- R6::R6Class(
   'build_changer_data',
