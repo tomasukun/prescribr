@@ -3,7 +3,8 @@
 language: R
 sudo: false
 #cache: packages
-#before_install:
+before_install:
+   - Rscript -e 'install.packages("devtools"); devtools::install_deps(".")'
 #  - Rscript -e 'install.packages("dplyr", lib="/home/travis/R-bin/lib/R/library/")'
 #  - Rscript -e 'install.packages("purrr", lib="/home/travis/R-bin/lib/R/library/")'
 #  - Rscript -e 'install.packages("readr", lib="/home/travis/R-bin/lib/R/library/")'
@@ -13,7 +14,6 @@ sudo: false
 #  - Rscript -e 'install.packages("Kmisc", lib="/home/travis/R-bin/lib/R/library/")'
 #  - Rscript -e 'install.packages("plyr", lib="/home/travis/R-bin/lib/R/library/")'
 install:
-  - Rscript -e 'install.packages("devtools"); devtools::install_deps(".")'
   - Rscript -e "0" --args --bootstrap-packrat
   - R -e "packrat::restore(restart = FALSE)"
 warnings_are_errors: false
