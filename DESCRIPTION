@@ -12,12 +12,12 @@ Depends:
     dplyr
 Imports:
     stringr,
+    ggplot2
+Suggests:
     tidyr,
     readr,
     purrr,
     Kmisc,
     plyr,
-    ggplot2
-Suggests:
     lubridate
 RoxygenNote: 5.0.1
