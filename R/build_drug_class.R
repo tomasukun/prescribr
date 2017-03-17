@@ -3,9 +3,7 @@
 #' @importFrom plyr mapvalues
 #' @import stringr
 #' @import tidyr
-#' @import readr
 #' @import purrr
-#' @importFrom Kmisc kLoad
 
 build_drug_class <- R6::R6Class(
   'build_drug_class',

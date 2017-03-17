@@ -3,10 +3,7 @@
 #' @importFrom plyr mapvalues
 #' @import stringr
 #' @import tidyr
-#' @import readr
 #' @import purrr
-#' @import ggplot2
-#' @importFrom Kmisc kLoad
  
 build_changer_data <- R6::R6Class(
   'build_changer_data',

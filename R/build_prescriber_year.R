@@ -2,7 +2,6 @@
 #' @import dplyr
 #' @import stringr
 #' @import tidyr
-#' @import readr
 #' @import purrr
 
 build_prescriber_year <- R6::R6Class(

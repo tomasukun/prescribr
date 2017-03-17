@@ -2,7 +2,6 @@
 #' @import dplyr
 #' @import stringr
 #' @import tidyr
-#' @import readr
 #' @import purrr
 
 study_pop_library <- R6::R6Class(
