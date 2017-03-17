@@ -3,18 +3,20 @@
 language: R
 sudo: false
 #cache: packages
-before_install:
-  - Rscript -e 'install.packages("dplyr", lib="/home/travis/R-bin/lib/R/library/")'
-  - Rscript -e 'install.packages("purrr", lib="/home/travis/R-bin/lib/R/library/")'
-  - Rscript -e 'install.packages("readr", lib="/home/travis/R-bin/lib/R/library/")'
-  - Rscript -e 'install.packages("stringr", lib="/home/travis/R-bin/lib/R/library/")'
-  - Rscript -e 'install.packages("tidyr", lib="/home/travis/R-bin/lib/R/library/")'
-  - Rscript -e 'install.packages("ggplot2", lib="/home/travis/R-bin/lib/R/library/")'
-  - Rscript -e 'install.packages("Kmisc", lib="/home/travis/R-bin/lib/R/library/")'
-  - Rscript -e 'install.packages("plyr", lib="/home/travis/R-bin/lib/R/library/")'
+#before_install:
+#  - Rscript -e 'install.packages("dplyr", lib="/home/travis/R-bin/lib/R/library/")'
+#  - Rscript -e 'install.packages("purrr", lib="/home/travis/R-bin/lib/R/library/")'
+#  - Rscript -e 'install.packages("readr", lib="/home/travis/R-bin/lib/R/library/")'
+#  - Rscript -e 'install.packages("stringr", lib="/home/travis/R-bin/lib/R/library/")'
+#  - Rscript -e 'install.packages("tidyr", lib="/home/travis/R-bin/lib/R/library/")'
+#  - Rscript -e 'install.packages("ggplot2", lib="/home/travis/R-bin/lib/R/library/")'
+#  - Rscript -e 'install.packages("Kmisc", lib="/home/travis/R-bin/lib/R/library/")'
+#  - Rscript -e 'install.packages("plyr", lib="/home/travis/R-bin/lib/R/library/")'
 install:
   - Rscript -e "0" --args --bootstrap-packrat
+  - R -e "packrat::restore(restart = FALSE)"
 warnings_are_errors: false
 cache:
-  directories: $TRAVIS_BUILD_DIR/packrat/
+  directories: 
+    - $TRAVIS_BUILD_DIR/packrat/lib
   packages: true
