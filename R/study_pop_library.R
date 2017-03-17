@@ -46,12 +46,12 @@ study_pop_library <- R6::R6Class(
     
     study_group_pop = list(
       statins_2013 = list(
-        claim_count_50plus = NULL,
+        claim_count = NULL,
         meal_payment = NULL,
         tagged_payment = NULL
       ),
       statins_2014 = list(
-        claim_count_50plus = NULL,
+        claim_count = NULL,
         meal_payment = NULL,
         tagged_payment = NULL
       )
@@ -59,7 +59,7 @@ study_pop_library <- R6::R6Class(
     
     exclusion_criteria = list(
       doc = 'M.?D.?|D.?O.?',
-      claim_count = 50,
+      claim_count = 100,
       states = c(state.abb, 'DC'),
       grad_year_limits = c(1910, 2013)
     ),
@@ -124,12 +124,30 @@ study_pop_library <- R6::R6Class(
       vaginal_cream = stringr::str_c("ESTRACE", "ESTRING", "VAGIFEM", "CLIMARA", "ALORA",
                                      "VIVELLE-DOT", "ESTROGEL", "PREMARIN", "MENEST",
                                      "ESTROPIPATE", sep = "|"),
-      opioids = stringr::str_c("BUTRANS", "DURAGESIC", "FENTANYL", "ZOHYDRO ER", "EXALGO", 
-                               "HYDROMORPHONE ER", "AVINZA", "KADIAN", "MS CONTIN", 
-                               "MORPHINE SULFATE ER", "OXYCONTIN", "OXYCODONE HCL ER", 
-                               "XARTEMIS XR", "OPANA ER", "OXYMORPHONE HCL ER", "NUCYNTA ER", 
-                               "ULTRAM ER", "TRAMADOL HCL ER", "DOLOPHINE HCL", 
-                               "METHADONE INTENSOL", "METHADONE HCL", "CONZIP", "RYZOLT", sep = "|")
+      opioids = stringr::str_c("CAPITAL W-CODEINE", "TYLENOL-CODEINE NO.3", "TYLENOL-CODEINE NO.4",
+                               "ACETAMINOPHEN-CODEINE", "ULTRACET", "TRAMADOL HCL-ACETAMINOPHEN",
+                               "TREZIX", "BUTORPHANOL TARTRATE", "SYNALGOS-DC", "ASPIRIN-CAFFEINE-DIHYDROCODEIN",
+                               "HYDROCODONE-ACETAMINOPHEN", "VICODIN ES", "VICODIN", "NORCO", "LORTAB",
+                               "VICODIN HP", "LORCET 10-650", "ZAMICET", "XODOL 10-300", "LORCET PLUS",
+                               "XODOL 7.5-300", "STAGESIC", "XODOL 5-300", "HYCET", "ZYDONE", "ZOLVIT",
+                               "MAXIDONE", "CO-GESIC", "HYDROCODONE-IBUPROFEN", "IBUDONE", "REPREXAIN",
+                               "VICOPROFEN", "XYLON 10", "HYDROMORPHONE HCL", "DILAUDID", "LEVORPHANOL TARTRATE",
+                               "DEMEROL", "MEPERIDINE HCL", "MEPERITAB", "MORPHINE SULFATE", "ROXICODONE",
+                               "OXECTA", "OXYCODONE CONCENTRATE", "OXYCODONE HCL", "ENDOCET", "PERCOCET",
+                               "PRIMLEV", "ROXICET", "TYLOX", "MAGNACET", "OXYCODONE-ACETAMINOPHEN",
+                               "PERCODAN", "ENDODAN", "OXYCODONE HCL-ASPIRIN", "OPANA", "OXYMORPHONE HCL",
+                               "PENTAZOCINE-ACETAMINOPHEN", "PENTAZOCINE-NALOXONE HCL", "NUCYNTA", "ULTRAM",
+                               "RYBIX ODT", "TRAMADOL HCL", "CODEINE SULFATE", "BUTRANS", "FENTANYL",
+                               "DURAGESIC", "ZOHYDRO ER", "HYDROMORPHONE ER", "EXALGO", "DOLOPHINE HCL",
+                               "METHADONE INTENSOL", "METHADONE HCL", "AVINZA", "KADIAN", "MS CONTIN",
+                               "MORPHINE SULFATE ER", "OXYCONTIN", "OXYCODONE HCL ER", "XARTEMIS XR",
+                               "OPANA ER", "OXYMORPHONE HCL ER", "NUCYNTA ER", "CONZIP", "ULTRAM ER",
+                               "TRAMADOL HCL ER", "RYZOLT", "OXYCODONE HCL-IBUPROFEN", sep = "|"),
+      oral_opioids = stringr::str_c("ZOHYDRO ER", "EXALGO", "HYDROMORPHONE ER", "AVINZA", "KADIAN",
+                                    "MS CONTIN", "MORPHINE SULFATE ER", "OXYCONTIN", "OXYCODONE HCL ER",
+                                    "XARTEMIS XR", "OPANA ER", "OXYMORPHONE HCL ER", "NUCYNTA ER",
+                                    "ULTRAM ER", "TRAMADOL HCL ER", "DOLOPHINE HCL", "METHADONE INTENSOL",
+                                    "METHADONE HCL", "CONZIP", "RYZOLT", sep = "|")
     ),
     
     partd_target = c(
@@ -183,7 +201,8 @@ study_pop_library <- R6::R6Class(
       'opthalmic_corticosteroid' = 'Lotemax',
       'opthalmic_antibiotic' = 'Besivance',
       'vaginal_cream' = 'Estrace',
-      'opioids' = 'Oxycontin'
+      'opioids' = 'Oxycontin',
+      'oral_opioids' = 'Oxycontin'
     ),
     
     figure_drug_class_formulary = c(
@@ -195,9 +214,9 @@ study_pop_library <- R6::R6Class(
       'opthalmic_corticosteroid' = 'Loteprednol',
       'opthalmic_antibiotic' = 'Besifloxacin',
       'vaginal_cream' = 'Estradiol',
-      'opioids' = 'Oxycodone'
+      'opioids' = 'Oxycodone',
+      'oral_opiods' = 'Oxycodone'
     )
     
   )
 )
-

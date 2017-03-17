@@ -127,22 +127,22 @@ build_figures <- R6::R6Class(
           theme(title = element_text( size = 18, color = "black", hjust = 0.5, face = "bold"))
       } else if(self$type == 'slopes') {
         annotate_text <- self$figure_data %>%
-          select(year, paid_group, mean_target_per_bene) %>%
-          tidyr::spread(year, mean_target_per_bene) %>%
+          select(year, paid_group, mean_prescribing_rate) %>%
+          tidyr::spread(year, mean_prescribing_rate) %>%
           mutate(
             change = `2014` - `2013`,
             percent_diff = round(100*(`2014` - `2013`)/`2013`, 1))
         figure <- ggplot2::ggplot(self$figure_data, 
-                                  aes(x = year, y = mean_target_per_bene, colour = paid_group)) + 
+                                  aes(x = year, y = mean_prescribing_rate, colour = paid_group)) + 
           geom_line(aes(group = paid_group), linetype = 1, size = 1.5) +  
           geom_point(size = 3, fill = 'white') +
           annotate("text", x = 2.15, y = annotate_text$`2014`, 
                    label = str_c(annotate_text$percent_diff, '%'), size = 12) +
-          scale_colour_brewer(palette = 'Spectral') +
-          ylab(sprintf("%s (%s \U00AE) Prescribing Rate per 1000 Beneficiaries \n",
+          scale_colour_brewer("Receipt of Payments", palette = 'Spectral') +
+          ylab(sprintf("%s (%s \U00AE) Prescribing Rate \n",
                        self$target_formulary_name, self$target_brand_name)) +
           xlab("") +
-          scale_y_continuous(limits = c(80, 170), breaks = seq(80, 170, 10), expand = c(0,0)) +
+          scale_y_continuous(limits = c(50, 105), breaks = seq(50, 105, 5), expand = c(0,0)) +
           theme(axis.text = element_text(face = "bold", size = 17, colour = "black")) +
           theme(panel.background = element_rect(colour = "white", fill = "white")) +
           theme(axis.line = element_line(colour = "black")) +
@@ -151,8 +151,8 @@ build_figures <- R6::R6Class(
           theme(panel.grid.major.y = element_line(colour = "white")) +
           theme(axis.ticks = element_line(colour = "black")) +
           theme(axis.title = element_text(hjust = 0.5)) +
-          theme(legend.key.size = unit(2, "cm"),
-                legend.text = element_text(size = 12, face = "bold")) +
+          theme(legend.key.size = unit(2.1, "cm"),
+                legend.text = element_text(size = 14, face = "bold")) +
           ggtitle(sprintf("%s", self$target_brand_name)) +
           theme(title = element_text( size = 18, color = "black", hjust = 0.5, face = "bold"))
       } else if(self$type == 'class-slopes') {
