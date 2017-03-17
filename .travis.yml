@@ -18,5 +18,5 @@ install:
 warnings_are_errors: false
 cache:
   directories: 
-    - $TRAVIS_BUILD_DIR/packrat/lib
+    - $TRAVIS_BUILD_DIR/packrat/
   packages: true
