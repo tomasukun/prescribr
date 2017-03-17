@@ -1,7 +1,6 @@
 #' Builder Class for Drug Class Study Groups
 #' @import dplyr
 #' @import stringr
-#' @import tidyr
 
 build_drug_class <- R6::R6Class(
   'build_drug_class',
