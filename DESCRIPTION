@@ -12,9 +12,9 @@ Depends:
     dplyr
 Imports:
     stringr,
-    ggplot2
+    ggplot2,
+    tidyr
 Suggests:
-    tidyr,
     readr,
     purrr,
     Kmisc,
