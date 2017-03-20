@@ -6,6 +6,7 @@ warnings_are_errors: false
 #cache: packages
 before_install:
   - Rscript -e 'install.packages("dplyr", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("DBI", lib="/home/travis/R-bin/lib/R/library/")'
 install:
   - Rscript -e "0" --args --bootstrap-packrat
   - R -e "packrat::restore(restart = FALSE)"

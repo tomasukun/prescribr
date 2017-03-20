@@ -19,4 +19,5 @@ Imports:
     plyr,
     lubridate
 Suggests:
+    assertthat
 RoxygenNote: 5.0.1
