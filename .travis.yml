@@ -11,5 +11,6 @@ install:
   - R -e "packrat::restore(restart = FALSE)"
 cache:
   directories: 
-    - $TRAVIS_BUILD_DIR/packrat/
+    - $TRAVIS_BUILD_DIR/packrat/src
+    - $TRAVIS_BUILD_DIR/packrat/lib
   packages: true
