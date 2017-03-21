@@ -10,9 +10,11 @@ Depends:
     R (>= 3.3.0),
     dplyr
 Imports:
-    assertthat, 
+    assertthat,
     DBI,
-    assertr,
+    R6,
+    magrittr,
+    tibble,
     testthat,
     stringr,
     ggplot2,
