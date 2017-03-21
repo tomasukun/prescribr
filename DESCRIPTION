@@ -22,7 +22,8 @@ Imports:
     readr,
     purrr,
     Kmisc,
-    plyr
+    plyr,
+    knitr
 Suggests:
 RoxygenNote: 5.0.1
 VignetteBuilder: knitr
