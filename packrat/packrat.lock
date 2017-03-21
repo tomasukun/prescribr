@@ -86,12 +86,6 @@ GithubUsername: RcppCore
 GithubRef: master
 GithubSha1: 6cf1301981f2f526fa26a7f56d9561057eda86b0
 
-Package: RcppEigen
-Source: CRAN
-Version: 0.3.2.8.1
-Hash: 5c4ccf2df0f6a5e541f2566e5952fc5c
-Requires: Matrix, Rcpp
-
 Package: SparseM
 Source: CRAN
 Version: 1.76
@@ -327,12 +321,6 @@ Package: lazyeval
 Source: CRAN
 Version: 0.2.0
 Hash: 3d6e7608e65bbf5cb170dab1e3c9ed8b
-
-Package: lme4
-Source: CRAN
-Version: 1.1-12
-Hash: 234cf3516dedb786800cba16e1cab46c
-Requires: MASS, Matrix, Rcpp, RcppEigen, lattice, minqa, nlme, nloptr
 
 Package: lubridate
 Source: CRAN
