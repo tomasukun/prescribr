@@ -9,7 +9,14 @@ before_install:
   - Rscript -e 'install.packages("DBI", lib="/home/travis/R-bin/lib/R/library/")'
   - Rscript -e 'install.packages("assertthat", lib="/home/travis/R-bin/lib/R/library/")'
   - Rscript -e 'install.packages("R6", lib="/home/travis/R-bin/lib/R/library/")'
-  - Rscript -e 'install.packages("Hmisc", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("Rcpp", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("magrittr", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("tibble", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("ggplot2", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("gtable", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("scales", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("munsell", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("colorspace", lib="/home/travis/R-bin/lib/R/library/")'
 install:
   - Rscript -e "0" --args --bootstrap-packrat
   - R -e "packrat::restore(restart = FALSE)"
