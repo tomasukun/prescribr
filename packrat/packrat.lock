@@ -561,8 +561,8 @@ Requires: magrittr, stringi
 
 Package: survival
 Source: CRAN
-Version: 2.39-2
-Hash: 46808767daa3f40733fb003b5d7f305a
+Version: 2.41-2
+Hash: a33b3f214498ec75e5b9027ec93dbaa4
 Requires: Matrix
 
 Package: svglite
