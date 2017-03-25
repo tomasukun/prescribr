@@ -2,7 +2,7 @@
 
 language: R
 sudo: false
-cache: packages
+#cache: packages
 warnings_are_errors: false
 before_install:
   - Rscript -e 'install.packages("dplyr", lib="/home/travis/R-bin/lib/R/library/")'
@@ -15,6 +15,9 @@ before_install:
   - Rscript -e 'install.packages("plyr", lib="/home/travis/R-bin/lib/R/library/")'
 install:
   - Rscript -e "0" --args --bootstrap-packrat
-#cache:
-#  directories: $TRAVIS_BUILD_DIR/packrat/
-#  packages: true
+  - R -e "packrat::restore(restart = FALSE)"
+cache:
+  directories: 
+    - $TRAVIS_BUILD_DIR/packrat/src
+    - $TRAVIS_BUILD_DIR/packrat/lib
+  packages: true
