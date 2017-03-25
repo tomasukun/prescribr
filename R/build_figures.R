@@ -1,9 +1,6 @@
 #' Builder class for figures
 #' @import dplyr
-#' @importFrom plyr mapvalues
 #' @import stringr
-#' @import tidyr
-#' @import readr
 #' @import ggplot2
 
 build_figures <- R6::R6Class(

@@ -2,19 +2,26 @@
 
 language: R
 sudo: false
-cache: packages
 warnings_are_errors: false
+#cache: packages
 before_install:
   - Rscript -e 'install.packages("dplyr", lib="/home/travis/R-bin/lib/R/library/")'
-  - Rscript -e 'install.packages("purrr", lib="/home/travis/R-bin/lib/R/library/")'
-  - Rscript -e 'install.packages("readr", lib="/home/travis/R-bin/lib/R/library/")'
-  - Rscript -e 'install.packages("stringr", lib="/home/travis/R-bin/lib/R/library/")'
-  - Rscript -e 'install.packages("tidyr", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("DBI", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("assertthat", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("R6", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("Rcpp", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("magrittr", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("tibble", lib="/home/travis/R-bin/lib/R/library/")'
   - Rscript -e 'install.packages("ggplot2", lib="/home/travis/R-bin/lib/R/library/")'
-  - Rscript -e 'install.packages("Kmisc", lib="/home/travis/R-bin/lib/R/library/")'
-  - Rscript -e 'install.packages("plyr", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("gtable", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("scales", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("munsell", lib="/home/travis/R-bin/lib/R/library/")'
+  - Rscript -e 'install.packages("colorspace", lib="/home/travis/R-bin/lib/R/library/")'
 install:
   - Rscript -e "0" --args --bootstrap-packrat
-#cache:
-#  directories: $TRAVIS_BUILD_DIR/packrat/
-#  packages: true
+  - R -e "packrat::restore(restart = FALSE)"
+cache:
+  directories: 
+    - $TRAVIS_BUILD_DIR/packrat/src
+    - $TRAVIS_BUILD_DIR/packrat/lib
+  packages: true

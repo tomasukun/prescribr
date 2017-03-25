@@ -3,20 +3,27 @@ Title: Analysis of industry payments to physicians and their prescribing behavio
 Version: 0.0.0.9000
 Authors@R: person("Thomas", "Aguilar", email = "taguilar87@gmail.com", role = c("aut", "cre"))
 Description: What the package does (one paragraph).
-Depends:
-    R (>= 3.3.0)
-License: What license is it under?
+License: GPL
 Encoding: UTF-8
 LazyData: true
+Depends:
+    R (>= 3.3.0),
+    dplyr
 Imports:
-    dplyr,
+    assertthat,
+    DBI,
+    R6,
+    magrittr,
+    tibble,
+    testthat,
     stringr,
+    ggplot2,
     tidyr,
     readr,
     purrr,
     Kmisc,
     plyr,
-    ggplot2
+    knitr
 Suggests:
-    lubridate
 RoxygenNote: 5.0.1
+VignetteBuilder: knitr

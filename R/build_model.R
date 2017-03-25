@@ -1,8 +1,6 @@
 #' Analysis class
 #' @import dplyr
-#' @importFrom plyr mapvalues
 #' @import stringr
-#' @import tidyr
 
 build_model <- R6::R6Class(
   'build_model',
