@@ -15,9 +15,11 @@ build_prescriber_year <- R6::R6Class(
     partd_phys_source = dplyr::data_frame(),
     partd_combined = dplyr::data_frame(),
     phys_compare_source = dplyr::data_frame(),
+    doc_specialty = NULL,
     
     initialize = function(yr = '2014') {
       self$year <- yr
+      self$doc_specialty <- self$doc_specialty_categories()
     },
     
     read_source_tables = function() {
@@ -81,7 +83,7 @@ build_prescriber_year <- R6::R6Class(
     
     filter_tables = function() {
       
-      exclude_specialites <- self$doc_specialty_categories %>% 
+      exclude_specialites <- self$doc_specialty %>% 
         filter(specialty_category == 'EXCLUDE') %>% 
         .$doc_specialty
       
