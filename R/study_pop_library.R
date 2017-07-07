@@ -1,9 +1,6 @@
 #' Library Class to hold exlusion criteria, study population numbers, and other descriptive data
 #' @import dplyr
 #' @import stringr
-#' @import tidyr
-#' @import readr
-#' @import purrr
 
 study_pop_library <- R6::R6Class(
   'study_pop_library',
@@ -14,8 +11,9 @@ study_pop_library <- R6::R6Class(
     processed_file_dir = '~/Dropbox/physician_payments/processed_source_data/',
     shared_docs_dir = '~/Dropbox/OP2 Documents/',
     
-    doc_specialty_categories = suppressMessages(
-      readr::read_csv('spec/partd_doc_specialty_tabulation_2014.csv')),
+    doc_specialty_categories = function() {
+      suppressMessages(readr::read_csv('spec/partd_doc_specialty_tabulation_2014.csv'))
+    },
     
     study_pop = list(
       study_2013 = list(
