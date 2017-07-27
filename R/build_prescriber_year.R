@@ -26,7 +26,9 @@ build_prescriber_year <- R6::R6Class(
       # read part D drug files
       self$partd_drug_source = readr::read_delim(
         paste0(self$source_file_dir, self$drug_folder, '/', self$year,
-               '/PartD_Prescriber_PUF_NPI_Drug.txt'), delim = '\t') %>% 
+               '/PartD_Prescriber_PUF_NPI_Drug.txt'), delim = '\t') 
+      names(self$partd_drug_source) <- toupper(names(self$partd_drug_source))
+      self$partd_drug_source = self$partd_drug_source %>% 
         select(NPI,
                doc_drug_brand_name = DRUG_NAME,
                doc_drug_generic_name = GENERIC_NAME,
@@ -41,7 +43,9 @@ build_prescriber_year <- R6::R6Class(
       # read part D physician files
       self$partd_phys_source = readr::read_delim(
         paste0(self$source_file_dir, self$phys_folder, '/', self$year, 
-               '/PartD_Prescriber_PUF_NPI.txt'), delim = '\t') %>% 
+               '/PartD_Prescriber_PUF_NPI.txt'), delim = '\t')
+      names(self$partd_phys_source) <- toupper(names(self$partd_phys_source))
+      self$partd_phys_source = self$partd_phys_source %>% 
         select(doc_zip = starts_with('NPPES_PROVIDER_ZIP5'),
                NPI, 
                doc_specialty = starts_with('SPECIALTY_DESC'),
