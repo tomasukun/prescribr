@@ -3,8 +3,13 @@ warnings_are_errors: false
 install:
   - R -e "0" --args --bootstrap-packrat
   - R -e "packrat::restore(restart = FALSE)"
+  - (echo "SOURCE_DIR=foo"; echo "PROCESSED_DIR=bar"; echo "SHARED_DIR=baz") >> ~/.Renviron
 cache:
   directories:
     - $TRAVIS_BUILD_DIR/packrat/src
     - $TRAVIS_BUILD_DIR/packrat/lib
   packages: true
+notifications:
+  email:
+    on_success: change
+    on_failure: change
