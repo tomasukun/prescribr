@@ -6,7 +6,7 @@ build_prescriber_year <- R6::R6Class(
   'build_prescriber_year',
   inherit = study_pop_library,
   public = list(
-    
+
     year = NULL,
     drug_folder = 'PartD_Prescriber_PUF_NPI_DRUG',
     phys_folder = 'PartD_Prescriber_PUF_NPI',
@@ -16,17 +16,17 @@ build_prescriber_year <- R6::R6Class(
     partd_combined = dplyr::data_frame(),
     phys_compare_source = dplyr::data_frame(),
     doc_specialty = NULL,
-    
+
     initialize = function(yr = '2014') {
       self$year <- yr
       self$doc_specialty <- self$doc_specialty_categories()
     },
-    
+
     read_source_tables = function() {
       # read part D drug files
       self$partd_drug_source = readr::read_delim(
         paste0(self$source_file_dir, self$drug_folder, '/', self$year,
-               '/PartD_Prescriber_PUF_NPI_Drug.txt'), delim = '\t') %>% 
+               '/PartD_Prescriber_PUF_NPI_Drug.txt'), delim = '\t') %>%
         select(NPI,
                doc_drug_brand_name = DRUG_NAME,
                doc_drug_generic_name = GENERIC_NAME,
@@ -40,10 +40,10 @@ build_prescriber_year <- R6::R6Class(
                doc_drug_total_drug_cost_65 = TOTAL_DRUG_COST_GE65)
       # read part D physician files
       self$partd_phys_source = readr::read_delim(
-        paste0(self$source_file_dir, self$phys_folder, '/', self$year, 
-               '/PartD_Prescriber_PUF_NPI.txt'), delim = '\t') %>% 
+        paste0(self$source_file_dir, self$phys_folder, '/', self$year,
+               '/PartD_Prescriber_PUF_NPI.txt'), delim = '\t') %>%
         select(doc_zip = starts_with('NPPES_PROVIDER_ZIP5'),
-               NPI, 
+               NPI,
                doc_specialty = starts_with('SPECIALTY_DESC'),
                doc_city = NPPES_PROVIDER_CITY,
                doc_last_name = NPPES_PROVIDER_LAST_ORG_NAME,
@@ -73,27 +73,27 @@ build_prescriber_year <- R6::R6Class(
                )
       # read phys compare files
       self$phys_compare_source = readr::read_csv(
-        paste0(self$source_file_dir, self$phys_comp_folder, '/2014', 
-               '/Physician_Compare_National_Downloadable_File.csv'), col_names = TRUE) %>% 
-        distinct(NPI, .keep_all = TRUE) %>% 
-        select(NPI, 
+        paste0(self$source_file_dir, self$phys_comp_folder, '/2014',
+               '/Physician_Compare_National_Downloadable_File.csv'), col_names = TRUE) %>%
+        distinct(NPI, .keep_all = TRUE) %>%
+        select(NPI,
                doc_grad_year = `Graduation year`,
                doc_group_size = `Number of Group Practice members`)
     },
-    
+
     filter_tables = function() {
-      
-      exclude_specialites <- self$doc_specialty %>% 
-        filter(specialty_category == 'EXCLUDE') %>% 
+
+      exclude_specialites <- self$doc_specialty %>%
+        filter(specialty_category == 'EXCLUDE') %>%
         .$doc_specialty
-      
+
       # filtering MDs or DOs
-      self$partd_phys_source <- self$partd_phys_source %>% 
-        filter(str_detect(doc_cred, self$exclusion_criteria$doc)) %>% 
+      self$partd_phys_source <- self$partd_phys_source %>%
+        filter(str_detect(doc_cred, self$exclusion_criteria$doc)) %>%
         distinct(NPI, .keep_all = TRUE)
       self$study_pop[[paste0('study_', self$year)]]$partd_docs <- nrow(self$partd_phys_source)
       # filtering specialties to exclude
-      self$partd_phys_source <- self$partd_phys_source %>% 
+      self$partd_phys_source <- self$partd_phys_source %>%
         filter(!(doc_specialty %in% exclude_specialites))
       self$study_pop[[paste0('study_', self$year)]]$partd_specialties_keep <- nrow(self$partd_phys_source)
       # filtering docs in US
@@ -111,18 +111,18 @@ build_prescriber_year <- R6::R6Class(
       # filtering docs with identical matching criteria
       self$partd_phys_source <- self$partd_phys_source %>%
         group_by(doc_last_name, doc_first_name,
-                 doc_city, doc_state) %>% 
-        mutate(dup_count = n()) %>% 
-        filter(dup_count == 1) %>% 
+                 doc_city, doc_state) %>%
+        mutate(dup_count = n()) %>%
+        filter(dup_count == 1) %>%
         ungroup()
       self$study_pop[[paste0('study_', self$year)]]$unq_match_crit_partd_docs <- nrow(self$partd_phys_source)
     },
-    
+
     merge_partd_phys_drugs = function() {
-      self$partd_combined <- self$partd_phys_source %>% 
+      self$partd_combined <- self$partd_phys_source %>%
         left_join(self$partd_drug_source, by = 'NPI')
     },
-    
+
     save_processed_tables = function() {
       study_pop <- self$study_pop
       partd_combined <- self$partd_combined
@@ -131,13 +131,13 @@ build_prescriber_year <- R6::R6Class(
       save(partd_docs, file = paste0(self$processed_file_dir, self$year,'/partd_docs.rData'))
       save(partd_combined, file = paste0(self$processed_file_dir, self$year,'/partd_combined.rData'))
     },
-    
+
     build_source = function() {
       self$read_source_tables()
       self$filter_tables()
       self$merge_partd_phys_drugs()
       self$save_processed_tables()
     }
-      
+
   )
 )
