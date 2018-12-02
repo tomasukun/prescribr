@@ -24,66 +24,13 @@ build_prescriber_year <- R6::R6Class(
 
     read_source_tables = function() {
       message('Reading Part D Drug File')
-
-      self$partd_drug_source = readr::read_delim(
-        paste0(self$source_file_dir, self$drug_folder, '/', self$year,
-               '/PartD_Prescriber_PUF_NPI_Drug.txt'), delim = '\t') %>%
-        select(NPI,
-               doc_drug_brand_name = DRUG_NAME,
-               doc_drug_generic_name = GENERIC_NAME,
-               doc_drug_bene_count = BENE_COUNT,
-               doc_drug_total_claims = TOTAL_CLAIM_COUNT,
-               doc_drug_total_day_supply = TOTAL_DAY_SUPPLY,
-               doc_drug_total_drug_cost = TOTAL_DRUG_COST,
-               doc_drug_bene_count_65 = BENE_COUNT_GE65,
-               doc_drug_total_claims_65 = TOTAL_CLAIM_COUNT_GE65,
-               doc_drug_total_day_supply_65 = TOTAL_DAY_SUPPLY_GE65,
-               doc_drug_total_drug_cost_65 = TOTAL_DRUG_COST_GE65)
+      private$read_partd_drug_file()
 
       message('Reading Part D Physician File')
-
-      self$partd_phys_source = readr::read_delim(
-        paste0(self$source_file_dir, self$phys_folder, '/', self$year,
-               '/PartD_Prescriber_PUF_NPI.txt'), delim = '\t') %>%
-        select(doc_zip = starts_with('NPPES_PROVIDER_ZIP5'),
-               NPI,
-               doc_specialty = starts_with('SPECIALTY_DESC'),
-               doc_city = NPPES_PROVIDER_CITY,
-               doc_last_name = NPPES_PROVIDER_LAST_ORG_NAME,
-               doc_first_name = NPPES_PROVIDER_FIRST_NAME,
-               doc_mi = NPPES_PROVIDER_MI,
-               doc_cred = NPPES_CREDENTIALS,
-               doc_gender = NPPES_PROVIDER_GENDER,
-               doc_state = NPPES_PROVIDER_STATE,
-               doc_bene_count = BENE_COUNT,
-               doc_total_claims = TOTAL_CLAIM_COUNT,
-               doc_total_drug_cost = TOTAL_DRUG_COST,
-               doc_total_day_supply = TOTAL_DAY_SUPPLY,
-               doc_bene_count_65 = BENE_COUNT_GE65,
-               doc_total_claims_65 = TOTAL_CLAIM_COUNT_GE65,
-               doc_total_drug_cost_65 = TOTAL_DRUG_COST_GE65,
-               doc_total_day_supply_65 = TOTAL_DAY_SUPPLY_GE65,
-               doc_brand_claims = BRAND_CLAIM_COUNT,
-               doc_brand_cost = BRAND_DRUG_COST,
-               doc_generic_claims = GENERIC_CLAIM_COUNT,
-               doc_generic_cost = GENERIC_DRUG_COST,
-               doc_other_count = OTHER_CLAIM_COUNT,
-               doc_other_cost = OTHER_DRUG_COST,
-               doc_mapd_claims = MAPD_CLAIM_COUNT,
-               doc_mapd_cost = MAPD_DRUG_COST,
-               doc_lis_claims = LIS_CLAIM_COUNT,
-               doc_lis_cost = LIS_DRUG_COST
-               )
+      private$read_partd_physician_file()
 
       message('Reading Physician Compare File')
-
-      self$phys_compare_source = readr::read_csv(
-        paste0(self$source_file_dir, self$phys_comp_folder, '/2014',
-               '/Physician_Compare_National_Downloadable_File.csv'), col_names = TRUE) %>%
-        distinct(NPI, .keep_all = TRUE) %>%
-        select(NPI,
-               doc_grad_year = `Graduation year`,
-               doc_group_size = `Number of Group Practice members`)
+      private$read_physician_compare_file()
     },
 
     filter_tables = function() {
@@ -107,10 +54,6 @@ build_prescriber_year <- R6::R6Class(
         filter(doc_state %in% self$exclusion_criteria$states)
       self$study_pop[[paste0('study_', self$year)]]$partd_us_docs <- nrow(self$partd_phys_source)
       # filtering docs with valid brand count
-      # self$partd_phys_source <- self$partd_phys_source %>%
-      #   filter(!is.na(doc_brand_claims))
-      # self$study_pop[[paste0('study_', self$year)]]$valid_brand_docs <- nrow(self$partd_phys_source)
-      # filtering docs in phys compare
       self$partd_phys_source <- self$partd_phys_source %>%
         inner_join(self$phys_compare_source, by = 'NPI')
       self$study_pop[[paste0('study_', self$year)]]$phys_comp_docs <- nrow(self$partd_phys_source)
@@ -148,6 +91,79 @@ build_prescriber_year <- R6::R6Class(
       self$merge_partd_phys_drugs()
       self$save_processed_tables()
     }
+  ),
+  private = list(
+    read_partd_drug_file = function() {
+      self$partd_drug_source = readr::read_delim(
+        paste0(self$source_file_dir, self$drug_folder, '/', self$year,
+               '/PartD_Prescriber_PUF_NPI_Drug.txt'), delim = '\t')
 
+      names(self$partd_drug_source) <- toupper(names(self$partd_drug_source))
+
+      self$partd_drug_source = self$partd_drug_source %>%
+        select(
+          NPI,
+          doc_drug_brand_name = DRUG_NAME,
+          doc_drug_generic_name = GENERIC_NAME,
+          doc_drug_bene_count = BENE_COUNT,
+          doc_drug_total_claims = TOTAL_CLAIM_COUNT,
+          doc_drug_total_day_supply = TOTAL_DAY_SUPPLY,
+          doc_drug_total_drug_cost = TOTAL_DRUG_COST,
+          doc_drug_bene_count_65 = BENE_COUNT_GE65,
+          doc_drug_total_claims_65 = TOTAL_CLAIM_COUNT_GE65,
+          doc_drug_total_day_supply_65 = TOTAL_DAY_SUPPLY_GE65,
+          doc_drug_total_drug_cost_65 = TOTAL_DRUG_COST_GE65
+        )
+    },
+
+    read_partd_physician_file = function() {
+      self$partd_phys_source = readr::read_delim(
+        paste0(self$source_file_dir, self$phys_folder, '/', self$year,
+               '/PartD_Prescriber_PUF_NPI.txt'), delim = '\t')
+
+      names(self$partd_phys_source) <- toupper(names(self$partd_phys_source))
+
+      self$partd_phys_source = self$partd_phys_source %>%
+        select(
+          doc_zip = starts_with('NPPES_PROVIDER_ZIP5'),
+          NPI,
+          doc_specialty = starts_with('SPECIALTY_DESC'),
+          doc_city = NPPES_PROVIDER_CITY,
+          doc_last_name = NPPES_PROVIDER_LAST_ORG_NAME,
+          doc_first_name = NPPES_PROVIDER_FIRST_NAME,
+          doc_mi = NPPES_PROVIDER_MI,
+          doc_cred = NPPES_CREDENTIALS,
+          doc_gender = NPPES_PROVIDER_GENDER,
+          doc_state = NPPES_PROVIDER_STATE,
+          doc_bene_count = BENE_COUNT,
+          doc_total_claims = TOTAL_CLAIM_COUNT,
+          doc_total_drug_cost = TOTAL_DRUG_COST,
+          doc_total_day_supply = TOTAL_DAY_SUPPLY,
+          doc_bene_count_65 = BENE_COUNT_GE65,
+          doc_total_claims_65 = TOTAL_CLAIM_COUNT_GE65,
+          doc_total_drug_cost_65 = TOTAL_DRUG_COST_GE65,
+          doc_total_day_supply_65 = TOTAL_DAY_SUPPLY_GE65,
+          doc_brand_claims = BRAND_CLAIM_COUNT,
+          doc_brand_cost = BRAND_DRUG_COST,
+          doc_generic_claims = GENERIC_CLAIM_COUNT,
+          doc_generic_cost = GENERIC_DRUG_COST,
+          doc_other_count = OTHER_CLAIM_COUNT,
+          doc_other_cost = OTHER_DRUG_COST,
+          doc_mapd_claims = MAPD_CLAIM_COUNT,
+          doc_mapd_cost = MAPD_DRUG_COST,
+          doc_lis_claims = LIS_CLAIM_COUNT,
+          doc_lis_cost = LIS_DRUG_COST
+        )
+    },
+
+    read_physician_compare_file = function() {
+      self$phys_compare_source = readr::read_csv(
+        paste0(self$source_file_dir, self$phys_comp_folder, '/2014',
+               '/Physician_Compare_National_Downloadable_File.csv'), col_names = TRUE) %>%
+        distinct(NPI, .keep_all = TRUE) %>%
+        select(NPI,
+               doc_grad_year = `Graduation year`,
+               doc_group_size = `Number of Group Practice members`)
+    }
   )
 )
