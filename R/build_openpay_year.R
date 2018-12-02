@@ -19,7 +19,7 @@ build_openpay_year <- R6::R6Class(
     read_source_tables = function() {
       self$openpay_source <- readr::read_csv(
         paste0(self$source_file_dir, self$openpay_folder, '/',
-               self$year, '/OP_DTL_GNRL_PGYR', self$year, '_P06302016.csv')
+               self$year, '/OP_DTL_GNRL_PGYR.csv')
         ) %>%
         filter(Dispute_Status_for_Publication == 'No',
                Third_Party_Payment_Recipient_Indicator == 'No Third Party Payment') %>%
