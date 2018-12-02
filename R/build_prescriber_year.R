@@ -85,7 +85,7 @@ build_prescriber_year <- R6::R6Class(
       save(partd_combined, file = paste0(self$processed_file_dir, self$year,'/partd_combined.rData'))
     },
 
-    build_source = function() {
+    build_tables = function() {
       self$read_source_tables()
       self$filter_tables()
       self$merge_partd_phys_drugs()
