@@ -23,7 +23,8 @@ build_prescriber_year <- R6::R6Class(
     },
 
     read_source_tables = function() {
-      # read part D drug files
+      message('Reading Part D Drug File')
+
       self$partd_drug_source = readr::read_delim(
         paste0(self$source_file_dir, self$drug_folder, '/', self$year,
                '/PartD_Prescriber_PUF_NPI_Drug.txt'), delim = '\t') %>%
@@ -38,7 +39,9 @@ build_prescriber_year <- R6::R6Class(
                doc_drug_total_claims_65 = TOTAL_CLAIM_COUNT_GE65,
                doc_drug_total_day_supply_65 = TOTAL_DAY_SUPPLY_GE65,
                doc_drug_total_drug_cost_65 = TOTAL_DRUG_COST_GE65)
-      # read part D physician files
+
+      message('Reading Part D Physician File')
+
       self$partd_phys_source = readr::read_delim(
         paste0(self$source_file_dir, self$phys_folder, '/', self$year,
                '/PartD_Prescriber_PUF_NPI.txt'), delim = '\t') %>%
@@ -71,7 +74,9 @@ build_prescriber_year <- R6::R6Class(
                doc_lis_claims = LIS_CLAIM_COUNT,
                doc_lis_cost = LIS_DRUG_COST
                )
-      # read phys compare files
+
+      message('Reading Physician Compare File')
+
       self$phys_compare_source = readr::read_csv(
         paste0(self$source_file_dir, self$phys_comp_folder, '/2014',
                '/Physician_Compare_National_Downloadable_File.csv'), col_names = TRUE) %>%
@@ -82,6 +87,7 @@ build_prescriber_year <- R6::R6Class(
     },
 
     filter_tables = function() {
+      message('Filtering Physicians by inclusion criteria')
 
       exclude_specialites <- self$doc_specialty %>%
         filter(specialty_category == 'EXCLUDE') %>%
@@ -119,11 +125,15 @@ build_prescriber_year <- R6::R6Class(
     },
 
     merge_partd_phys_drugs = function() {
+      message('Merging Physician file with Part D Drug file')
+
       self$partd_combined <- self$partd_phys_source %>%
         left_join(self$partd_drug_source, by = 'NPI')
     },
 
     save_processed_tables = function() {
+      message('Saving processed prescriber file')
+
       study_pop <- self$study_pop
       partd_combined <- self$partd_combined
       partd_docs <- self$partd_phys_source
