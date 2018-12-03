@@ -17,9 +17,11 @@ build_openpay_year <- R6::R6Class(
     },
 
     read_source_tables = function() {
+      message('Reading Open Payments Data')
+
       self$openpay_source <- readr::read_csv(
         paste0(self$source_file_dir, self$openpay_folder, '/',
-               self$year, '/OP_DTL_GNRL_PGYR', self$year, '_P06302016.csv')
+               self$year, '/OP_DTL_GNRL_PGYR.csv')
         ) %>%
         filter(Dispute_Status_for_Publication == 'No',
                Third_Party_Payment_Recipient_Indicator == 'No Third Party Payment') %>%
@@ -52,6 +54,8 @@ build_openpay_year <- R6::R6Class(
     },
 
     process_source_tables = function() {
+      message('Processing Open Payments Data')
+
       self$openpay_docs <- self$openpay_source %>%
         group_by(doc_id) %>%
         mutate(total_payment_dollars = sum(payment_dollars, na.rm = TRUE)) %>%
@@ -63,6 +67,8 @@ build_openpay_year <- R6::R6Class(
     },
 
     save_processed_tables = function() {
+      message('Saving Processed Open Payments Data')
+
       save(study_pop, file = 'data/study_pop.rData')
       openpay <- self$openpay_source
       openpay_docs <- self$openpay_docs
